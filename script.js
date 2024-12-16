@@ -1,3 +1,4 @@
+
 // function randomColor() {
 //     const r = Math.floor(Math.random() * 255);
 //     const g = Math.floor(Math.random() * 255);
@@ -30,27 +31,25 @@
 // const centerY = height / 2;
 // const radius = width / 2;
 
-// let items = document.getElementById("itemTextarea").value.split("\n").filter(item => item.trim() !== "");
+// let items = document.getElementById("itemTextarea").value.split("\n");
 // let images = {}; // Store uploaded images
 // let currentDeg = 0;
-// let step = 360 / (items.length || 1);
+// let step = 360 / items.length;
 // let colors = [];
 // let itemDegs = {};
 
-// // Generate initial colors
 // for (let i = 0; i < items.length; i++) {
 //     colors.push(randomColor());
 // }
 
-// // Event Listener for Dynamic Updates
 // document.getElementById("itemTextarea").addEventListener("input", () => {
 //     createWheel();
 // });
 
-// // Create Wheel
+// //Create Wheel
 // function createWheel() {
-//     items = document.getElementById("itemTextarea").value.split("\n").filter(item => item.trim() !== "");
-//     step = 360 / (items.length || 1);
+//     items = document.getElementById("itemTextarea").value.split("\n");
+//     step = 360 / items.length;
 //     colors = [];
 //     for (let i = 0; i < items.length; i++) {
 //         colors.push(randomColor());
@@ -98,15 +97,25 @@
 //         } else {
 //             // Draw Text
 //             ctx.fillStyle = color.r > 150 || color.g > 150 || color.b > 150 ? "#000" : "#fff";
-//             ctx.font = "bold 24px serif";
+//             ctx.font = "bold 30px";
 //             ctx.fillText(items[i], 130, 10);
 //         }
 //         ctx.restore();
 
 //         itemDegs[items[i]] = {
-//             startDeg: startDeg % 360,
-//             endDeg: endDeg % 360,
+//             startDeg: startDeg,
+//             endDeg: endDeg,
 //         };
+
+//         // Check Winner
+//         if (
+//             startDeg % 360 < 360 &&
+//             startDeg % 360 > 270 &&
+//             endDeg % 360 > 0 &&
+//             endDeg % 360 < 90
+//         ) {
+//             document.getElementById("winner").innerHTML = items[i];
+//         }
 //     }
 // }
 
@@ -117,41 +126,8 @@
 
 // function animate() {
 //     if (pause) {
-//         // Determine the final winner when the wheel stops
-//         const normalizedDeg = (currentDeg % 360 + 360) % 360;
-//         const winningItem = items.find((item) => {
-//             const { startDeg, endDeg } = itemDegs[item];
-//             return (
-//                 (normalizedDeg >= startDeg && normalizedDeg < endDeg) ||
-//                 (startDeg > endDeg && (normalizedDeg >= startDeg || normalizedDeg < endDeg))
-//             );
-//         });
-//         if (images[winningItem]) {
-//             document.getElementById("winner").innerHTML = `<img src="${images[winningItem].src}" alt="${winningItem}" style="width: 50px; height: 50px;">`;
-//         } else {
-//             document.getElementById("winner").textContent = winningItem || "NONE";
-//         }
 //         return;
 //     }
-
-//     // Clear previous value and dynamically update during spin
-//     const normalizedDeg = (currentDeg % 360 + 360) % 360;
-//     const activeItem = items.find((item) => {
-//         const { startDeg, endDeg } = itemDegs[item];
-//         return (
-//             (normalizedDeg >= startDeg && normalizedDeg < endDeg) ||
-//             (startDeg > endDeg && (normalizedDeg >= startDeg || normalizedDeg < endDeg))
-//         );
-//     });
-
-//     if (activeItem) {
-//         if (images[activeItem]) {
-//             document.getElementById("winner").innerHTML = `<img src="${images[activeItem].src}" alt="${activeItem}" style="width: 50px; height: 50px;">`;
-//         } else {
-//             document.getElementById("winner").textContent = activeItem;
-//         }
-//     }
-
 //     speed = easeOutSine(getPercent(currentDeg, maxRotation, 0)) * 20;
 //     if (speed < 0.01) {
 //         speed = 0;
@@ -166,9 +142,6 @@
 //     if (speed !== 0) {
 //         return;
 //     }
-//     // Reset winner display
-//     document.getElementById("winner").textContent = "SPINNING...";
-
 //     maxRotation = 0;
 //     currentDeg = 0;
 //     createWheel();
@@ -185,7 +158,7 @@
 
 //     Array.from(files).forEach((file) => {
 //         const img = new Image();
-//         const itemName = file.name.split(".")[0];
+//         const itemName = file.name.split(".")[0]; // Use file name (without extension) as the label
 //         img.onload = () => {
 //             images[itemName] = img;
 //             updateTextareaWithImages();
@@ -213,14 +186,8 @@
 
 
 
-
-
-function randomColor() {
-    const r = Math.floor(Math.random() * 255);
-    const g = Math.floor(Math.random() * 255);
-    const b = Math.floor(Math.random() * 255);
-    return { r, g, b };
-}
+// Fixed set of colors for wheel pieces
+const fixedColors = ["#FF5733", "#33FF57", "#3357FF"]; // Add your desired colors here
 
 function toRad(deg) {
     return deg * (Math.PI / 180.0);
@@ -251,25 +218,17 @@ let items = document.getElementById("itemTextarea").value.split("\n");
 let images = {}; // Store uploaded images
 let currentDeg = 0;
 let step = 360 / items.length;
-let colors = [];
 let itemDegs = {};
 
-for (let i = 0; i < items.length; i++) {
-    colors.push(randomColor());
-}
-
+// Event Listener for Text Input Updates
 document.getElementById("itemTextarea").addEventListener("input", () => {
     createWheel();
 });
 
 // Create Wheel
 function createWheel() {
-    items = document.getElementById("itemTextarea").value.split("\n").filter(item => item.trim() !== "");
-    step = 360 / (items.length || 1);
-    colors = [];
-    for (let i = 0; i < items.length; i++) {
-        colors.push(randomColor());
-    }
+    items = document.getElementById("itemTextarea").value.split("\n").filter((item) => item.trim() !== "");
+    step = 360 / items.length;
     draw();
 }
 
@@ -286,17 +245,11 @@ function draw() {
     for (let i = 0; i < items.length; i++, startDeg += step) {
         const endDeg = startDeg + step;
 
-        const color = colors[i];
-        const colorStyle = `rgb(${color.r},${color.g},${color.b})`;
+        const colorStyle = fixedColors[i % fixedColors.length]; // Cycle through the fixed colors
 
+        // Draw Wheel Segment
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
-        ctx.fillStyle = `rgb(${color.r - 30},${color.g - 30},${color.b - 30})`;
-        ctx.lineTo(centerX, centerY);
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius - 30, toRad(startDeg), toRad(endDeg));
         ctx.fillStyle = colorStyle;
         ctx.lineTo(centerX, centerY);
         ctx.fill();
@@ -312,7 +265,7 @@ function draw() {
             ctx.drawImage(img, 110, -30, 40, 40); // Adjust position and size
         } else {
             // Draw Text
-            ctx.fillStyle = color.r > 150 || color.g > 150 || color.b > 150 ? "#000" : "#fff";
+            ctx.fillStyle = "#fff"; // Text color
             ctx.font = "bold 24px serif";
             ctx.fillText(items[i], 130, 10);
         }
@@ -374,7 +327,7 @@ function handleImageUpload() {
 
     Array.from(files).forEach((file) => {
         const img = new Image();
-        const itemName = file.name.split(".")[0]; // Use file name (without extension) as the label
+        const itemName = file.name.split(".")[0];
         img.onload = () => {
             images[itemName] = img;
             updateTextareaWithImages();
