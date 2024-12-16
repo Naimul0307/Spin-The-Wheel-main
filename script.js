@@ -73,10 +73,10 @@
                 ctx.lineTo(centerX, centerY);
                 ctx.fill();
                 ctx.textAlign = "center";
-                // Draw Image inside the segment
+
                 if (images[items[i]]) {
                     const img = images[items[i]];
-
+                
                     // Save the context and clip to the slice
                     ctx.save();
                     ctx.beginPath();
@@ -84,21 +84,20 @@
                     ctx.arc(centerX, centerY, radius, toRad(startDeg), toRad(endDeg));
                     ctx.closePath();
                     ctx.clip();
-
-                    // Draw the image stretched across the slice
-                    const imgWidth = radius * 1.5;
-                    const imgHeight = radius * 1.5;
-                    const sliceCenterX = Math.cos(toRad((startDeg + endDeg) / 2)) * radius * 0.5;
-                    const sliceCenterY = Math.sin(toRad((startDeg + endDeg) / 2)) * radius * 0.5;
-
-                    ctx.drawImage(
-                        img,
-                        centerX - imgWidth / 2 + sliceCenterX,
-                        centerY - imgHeight / 2 + sliceCenterY,
-                        imgWidth,
-                        imgHeight
-                    );
-
+                
+                    // Calculate slice angle and image size dynamically
+                    const sliceAngle = endDeg - startDeg; // Slice angle in degrees
+                    const sliceRadius = radius * 0.9; // Padding to prevent overflow
+                    const imgSize = sliceRadius * Math.sin(toRad(sliceAngle / 2)) * 0.7; // Adjust size based on angle
+                
+                    // Calculate the position for centering the image in the slice
+                    const angleMid = toRad((startDeg + endDeg) / 2); // Midpoint of the slice
+                    const imgX = centerX + Math.cos(angleMid) * sliceRadius * 0.6 - imgSize / 2;
+                    const imgY = centerY + Math.sin(angleMid) * sliceRadius * 0.6 - imgSize / 2;
+                
+                    // Draw the image
+                    ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
+                
                     ctx.restore(); // Restore clipping
                 } else {
                     // Draw Text if no image
@@ -106,7 +105,7 @@
                     ctx.translate(centerX, centerY);
                     ctx.rotate(toRad((startDeg + endDeg) / 2));
 
-                    ctx.font = `bold 10PX serif`;
+                    ctx.font = `bold 25px serif`;
                     ctx.fillStyle = "#fff";
                     ctx.fillText(items[i], radius * 0.7, 5);
                     ctx.restore();
