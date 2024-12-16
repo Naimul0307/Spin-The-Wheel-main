@@ -43,91 +43,107 @@
             step = 360 / items.length;
             draw();
         }
+        // Update the winner text/image display
+function updateWinnerDisplay(winner) {
+    const winnerText = document.getElementById("winner-text");
+    const winnerImage = document.getElementById("winner-image");
 
-        // Draw Wheel
-        function draw() {
-            ctx.clearRect(0, 0, width, height); // Clear the canvas
+    if (images[winner]) {
+        // Display the image if the winner has an image
+        winnerText.style.display = "none";
+        winnerImage.style.display = "block";
+        winnerImage.src = images[winner].src;
+    } else {
+        // Display the text if the winner has no image
+        winnerText.style.display = "block";
+        winnerImage.style.display = "none";
+        winnerText.textContent = winner;
+    }
+}
 
-            // Draw the background (light color)
+// In the draw function, check if the wheel's slice has the winning item
+function draw() {
+    ctx.clearRect(0, 0, width, height); // Clear the canvas
+
+    // Draw the background (light color)
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, toRad(0), toRad(360));
+    ctx.fillStyle = `rgb(240, 202, 202)`; // Default background color
+    ctx.lineTo(centerX, centerY);
+    ctx.fill();
+
+    if (items.length === 0 || items[0].trim() === "") {
+        return; // Exit if no items
+    }
+
+    let startDeg = currentDeg; // Start angle for segments
+    for (let i = 0; i < items.length; i++, startDeg += step) {
+        const endDeg = startDeg + step;
+
+        // Assign color for the segment
+        const colorStyle = fixedColors[i % fixedColors.length];
+
+        // Draw Wheel Segment
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
+        ctx.fillStyle = colorStyle; // Use the color from fixedColors array
+        ctx.lineTo(centerX, centerY);
+        ctx.fill();
+        ctx.textAlign = "center";
+
+        if (images[items[i]]) {
+            const img = images[items[i]];
+        
+            // Save the context and clip to the slice
+            ctx.save();
             ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, toRad(0), toRad(360));
-            ctx.fillStyle = `rgb(240, 202, 202)`; // Default background color
-            ctx.lineTo(centerX, centerY);
-            ctx.fill();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, toRad(startDeg), toRad(endDeg));
+            ctx.closePath();
+            ctx.clip();
+        
+            // Calculate slice angle and image size dynamically
+            const sliceAngle = endDeg - startDeg; // Slice angle in degrees
+            const sliceRadius = radius * 0.9; // Padding to prevent overflow
+            const imgSize = sliceRadius * Math.sin(toRad(sliceAngle / 2)) * 0.7; // Adjust size based on angle
+        
+            // Calculate the position for centering the image in the slice
+            const angleMid = toRad((startDeg + endDeg) / 2); // Midpoint of the slice
+            const imgX = centerX + Math.cos(angleMid) * sliceRadius * 0.6 - imgSize / 2;
+            const imgY = centerY + Math.sin(angleMid) * sliceRadius * 0.6 - imgSize / 2;
+        
+            // Draw the image
+            ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
+        
+            ctx.restore(); // Restore clipping
+        } else {
+            // Draw Text if no image
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(toRad((startDeg + endDeg) / 2));
 
-            if (items.length === 0 || items[0].trim() === "") {
-                return; // Exit if no items
-            }
+            ctx.font = `bold 25px serif`;
+            ctx.fillStyle = "#fff";
+            ctx.fillText(items[i], radius * 0.7, 5);
+            ctx.restore();
+        } 
 
-            let startDeg = currentDeg; // Start angle for segments
-            for (let i = 0; i < items.length; i++, startDeg += step) {
-                const endDeg = startDeg + step;
+        itemDegs[items[i]] = {
+            startDeg: startDeg,
+            endDeg: endDeg,
+        };                
 
-                // Assign color for the segment
-                const colorStyle = fixedColors[i % fixedColors.length];
-
-                // Draw Wheel Segment
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
-                ctx.fillStyle = colorStyle; // Use the color from fixedColors array
-                ctx.lineTo(centerX, centerY);
-                ctx.fill();
-                ctx.textAlign = "center";
-
-                if (images[items[i]]) {
-                    const img = images[items[i]];
-                
-                    // Save the context and clip to the slice
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.moveTo(centerX, centerY);
-                    ctx.arc(centerX, centerY, radius, toRad(startDeg), toRad(endDeg));
-                    ctx.closePath();
-                    ctx.clip();
-                
-                    // Calculate slice angle and image size dynamically
-                    const sliceAngle = endDeg - startDeg; // Slice angle in degrees
-                    const sliceRadius = radius * 0.9; // Padding to prevent overflow
-                    const imgSize = sliceRadius * Math.sin(toRad(sliceAngle / 2)) * 0.7; // Adjust size based on angle
-                
-                    // Calculate the position for centering the image in the slice
-                    const angleMid = toRad((startDeg + endDeg) / 2); // Midpoint of the slice
-                    const imgX = centerX + Math.cos(angleMid) * sliceRadius * 0.6 - imgSize / 2;
-                    const imgY = centerY + Math.sin(angleMid) * sliceRadius * 0.6 - imgSize / 2;
-                
-                    // Draw the image
-                    ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
-                
-                    ctx.restore(); // Restore clipping
-                } else {
-                    // Draw Text if no image
-                    ctx.save();
-                    ctx.translate(centerX, centerY);
-                    ctx.rotate(toRad((startDeg + endDeg) / 2));
-
-                    ctx.font = `bold 25px serif`;
-                    ctx.fillStyle = "#fff";
-                    ctx.fillText(items[i], radius * 0.7, 5);
-                    ctx.restore();
-                } 
-                  itemDegs[items[i]] = {
-                    startDeg: startDeg,
-                    endDeg: endDeg,
-                };                
-                
-                // Check Winner
-                if (
-                    startDeg % 360 < 360 &&
-                    startDeg % 360 > 270 &&
-                    endDeg % 360 > 0 &&
-                    endDeg % 360 < 90
-                ) {
-                    document.getElementById("winner").innerHTML = items[i];
-                }
-            
-  
-            }
+        // Check Winner and Update the Display
+        if (
+            startDeg % 360 < 360 &&
+            startDeg % 360 > 270 &&
+            endDeg % 360 > 0 &&
+            endDeg % 360 < 90
+        ) {
+            updateWinnerDisplay(items[i]); // Update winner display with image or text
         }
+    }
+}
 
         // Spin Wheel
         let speed = 0;

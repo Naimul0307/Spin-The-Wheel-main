@@ -11,11 +11,15 @@
         <textarea id="itemTextarea"></textarea>
         <input type="file" id="imageUpload" multiple accept="image/*" onchange="handleImageUpload()">
     </div>
+    
     <div class="wheel">
-        <canvas id="canvas" width="500" height="500"></canvas>
+        <canvas id="canvas" width="400" height="400"></canvas>
         <div class="center-circle" onclick="spin()">
-            <div><p id="winner">NONE</p></div>
-        </div>
+            <div id="winner-display">
+                <p id="winner-text">NONE</p>
+                <img id="winner-image" src="" alt="" style="display:none;">
+            </div>
+        </div>        
         <div class="triangle"></div>
     </div>
     <script src="script.js"></script>

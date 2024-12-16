@@ -2,9 +2,9 @@
 html,body {
 margin: 0;
 padding: 0;
-height: 100vh;
+height: 80vh;
 display: flex;
-flex-direction: row; /* Arrange input area and content side by side */
+flex-direction: row;
 background-color: #333;
 color: white;
 }
@@ -51,6 +51,8 @@ margin-bottom: 40px;
 .wheel {
 display: flex;
 position: relative;
+top:60px;
+right: -15%
 }
 
 .center-circle {
@@ -80,6 +82,14 @@ position: relative;
     text-overflow: ellipsis; /* Show ellipsis when text overflows */
 }
 
+.center-circle img {
+    width: 100%; /* Make the image width 100% of the circle */
+    height: 100%; /* Make the image height 100% of the circle */
+    object-fit: contain; /* Ensure the image is contained inside the circle and preserves its aspect ratio */
+    object-position: center; /* Center the image inside the circle */
+}
+
+
 .triangle {
 width: 0; 
 height: 0; 
@@ -91,3 +101,4 @@ top: 50%;
 right: -3%; /* Adjust position as needed */
 transform: translateY(-50%);
 }
+
