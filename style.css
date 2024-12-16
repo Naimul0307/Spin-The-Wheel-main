@@ -49,13 +49,12 @@ margin-bottom: 40px;
 
 .wheel {
 display: flex;
-justify-content: center;
 position: relative;
 }
 
 .center-circle {
-    width: 100px;
-    height: 100px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     background-color: #fff;
     color: #333;
@@ -67,8 +66,17 @@ position: relative;
     justify-content: center; /* Center content horizontally */
     align-items: center; /* Center content vertically */
     text-align: center; /* Align text within the circle */
-    font-size: 14px; /* Adjust font size as needed */
+    font-size: 20px; /* Fixed font size */
+    font-weight: bolder;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: add a subtle shadow */
+    padding: 5px; /* Optional: Add padding */
+    overflow: hidden; /* Prevent overflow */
+}
+
+.center-circle p {
+    margin: 0;
+    white-space: nowrap; /* Prevent wrapping to the next line */
+    text-overflow: ellipsis; /* Show ellipsis when text overflows */
 }
 
 .triangle {
@@ -79,6 +87,6 @@ border-bottom: 20px solid transparent; /* Increase height of the triangle */
 border-right: 60px solid white; /* Increase width of the triangle */
 position: absolute;
 top: 50%;
-right: -450%; /* Adjust position as needed */
+right: -3%; /* Adjust position as needed */
 transform: translateY(-50%);
 }
