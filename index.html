@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Spin the Wheel</title>
+</head>
+<body>
+    <div class="inputArea">
+        <textarea rows="20" cols="30" id="itemTextarea"></textarea>
+        <input type="file" id="imageUpload" multiple accept="image/*" onchange="handleImageUpload()">
+    </div>
+    <div class="wheel">
+        <canvas id="canvas" width="500" height="500"></canvas>
+        <div class="center-circle" onclick="spin()">
+            <div><p id="winner">NONE</p></div>
+            <div class="triangle"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
