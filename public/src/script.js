@@ -44,22 +44,22 @@
             draw();
         }
         // Update the winner text/image display
-function updateWinnerDisplay(winner) {
-    const winnerText = document.getElementById("winner-text");
-    const winnerImage = document.getElementById("winner-image");
+        function updateWinnerDisplay(winner) {
+            const winnerText = document.getElementById("winner-text");
+            const winnerImage = document.getElementById("winner-image");
 
-    if (images[winner]) {
-        // Display the image if the winner has an image
-        winnerText.style.display = "none";
-        winnerImage.style.display = "block";
-        winnerImage.src = images[winner].src;
-    } else {
-        // Display the text if the winner has no image
-        winnerText.style.display = "block";
-        winnerImage.style.display = "none";
-        winnerText.textContent = winner;
-    }
-}
+            if (images[winner]) {
+                // Display the image if the winner has an image
+                winnerText.style.display = "none";
+                winnerImage.style.display = "block";
+                winnerImage.src = images[winner].src;
+            } else {
+                // Display the text if the winner has no image
+                winnerText.style.display = "block";
+                winnerImage.style.display = "none";
+                winnerText.textContent = winner;
+            }
+        }
 
 // In the draw function, check if the wheel's slice has the winning item
 function draw() {
@@ -145,39 +145,53 @@ function draw() {
     }
 }
 
-        // Spin Wheel
-        let speed = 0;
-        let maxRotation = randomRange(360 * 3, 360 * 6);
-        let pause = false;
+// Spin Wheel
+let speed = 0;
+let maxRotation = randomRange(360 * 5, 360 * 10);  // Increased max rotation to spin for a longer time
+let pause = false;
+const spinSound = new Audio("../public/mp3/wheel-spin1.mp3");
+spinSound.loop = true;
 
-        function animate() {
-            if (pause) {
-                return;
-            }
-            speed = easeOutSine(getPercent(currentDeg, maxRotation, 0)) * 20;
-            if (speed < 0.01) {
-                speed = 0;
-                pause = true;
-            }
-            currentDeg += speed;
-            draw();
-            window.requestAnimationFrame(animate);
-        }
+function animate() {
+    if (pause) {
+        spinSound.pause(); // Stop the sound when spinning is paused
+        spinSound.currentTime = 0; // Reset sound to the beginning
+        return;
+    }
 
-        function spin() {
-            if (speed !== 0) {
-                return;
-            }
-            maxRotation = 0;
-            currentDeg = 0;
-            createWheel();
-            draw();
+    speed = easeOutSine(getPercent(currentDeg, maxRotation, 0)) * 30;  // Increased speed multiplier
+    if (speed < 0.1) {
+        speed = 0;
+        pause = true; // Stop the animation loop
+        spinSound.pause(); // Stop the sound
+        spinSound.currentTime = 0; // Reset sound to the beginning
+    }
 
-            maxRotation = randomRange(360 * 3, 360 * 6);
-            pause = false;
-            window.requestAnimationFrame(animate);
-        }
+    currentDeg += speed;
+    draw();
+    window.requestAnimationFrame(animate);
+}
 
+function spin() {
+    if (speed !== 0) {
+        return; // Prevent spinning if already spinning
+    }
+
+    maxRotation = 0;
+    currentDeg = 0;
+    createWheel();
+    draw();
+
+    maxRotation = randomRange(360 * 5, 360 * 10); // Increase spin time by adjusting maxRotation
+    pause = false;
+
+    spinSound.play(); // Start playing the sound
+    spinSound.loop = true; // Ensure the sound loops while spinning
+
+    window.requestAnimationFrame(animate);
+}
+
+        
         // Handle Image Upload
         function handleImageUpload() {
             const files = document.getElementById("imageUpload").files;
