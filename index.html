@@ -12,9 +12,9 @@
         <textarea id="itemTextarea"></textarea>
         <input type="file" id="imageUpload" multiple accept="image/*" onchange="handleImageUpload()">
     </div>
-
+    
     <div class="wheel">
-        <canvas id="canvas" width="400" height="400"></canvas>
+        <canvas id="canvas" width="900" height="900"></canvas>
         <div class="center-circle" onclick="spin()">
             <div id="winner-display">
                 <p id="winner-text">NONE</p>
@@ -23,16 +23,6 @@
         </div>        
         <div class="triangle"></div>
     </div>
-
-    <div id="result-popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; text-align: center; z-index: 1000;">
-        <img id="popup-winner-image" style="display: none; max-width: 100%; height: auto;" alt="Winner Image" />    
-<div id="popup-winner-text" style="display: none; font-size: 24px; font-weight: bold; color: #333;"></div>
-
-        <button onclick="closeResultPopup()" style="margin-top: 20px; padding: 10px 20px; background: #007BFF; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Close</button>
-    </div>
-    
-
-
     <script src="public/src/script.js"></script>
 </body>
 </html>
