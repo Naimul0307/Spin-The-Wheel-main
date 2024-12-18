@@ -1,6 +1,33 @@
 let userBackgroundImage = null; // Store the selected background image
 const fixedColors = ["#FF5733", "#33FF57", "#3357FF", "#FFD700", "#FF69B4"]; // Default colors
 
+
+    // Update fixedColors array dynamically
+    document.getElementById("color1").addEventListener("input", (event) => {
+        fixedColors[0] = event.target.value;
+        draw(); // Redraw the wheel
+    });
+
+    document.getElementById("color2").addEventListener("input", (event) => {
+        fixedColors[1] = event.target.value;
+        draw(); // Redraw the wheel
+    });
+
+    document.getElementById("color3").addEventListener("input", (event) => {
+        fixedColors[2] = event.target.value;
+        draw(); // Redraw the wheel
+    });
+
+    document.getElementById("color4").addEventListener("input", (event) => {
+        fixedColors[3] = event.target.value;
+        draw(); // Redraw the wheel
+    });
+
+    document.getElementById("color5").addEventListener("input", (event) => {
+        fixedColors[4] = event.target.value;
+        draw(); // Redraw the wheel
+    });
+
 function toRad(deg) {
     return deg * (Math.PI / 180.0);
 }
