@@ -1,6 +1,5 @@
 let userBackgroundImage = null; // Store the selected background image
-
-const fixedColors = ["#FF5733", "#33FF57", "#3357FF", "#FFD700", "#FF69B4"];
+const fixedColors = ["#FF5733", "#33FF57", "#3357FF", "#FFD700", "#FF69B4"]; // Default colors
 
 function toRad(deg) {
     return deg * (Math.PI / 180.0);
@@ -121,13 +120,17 @@ function draw() {
     for (let i = 0; i < items.length; i++, startDeg += step) {
         const endDeg = startDeg + step;
 
-        // Assign color for the segment
-        const colorStyle = fixedColors[i % fixedColors.length];
+        // If background image is used, set transparent color for the slices
+        let colorStyle = "transparent";
+        if (!userBackgroundImage) {
+            // Assign color for the segment if no background image is set
+            colorStyle = fixedColors[i % fixedColors.length];
+        }
 
         // Draw Wheel Segment
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
-        ctx.fillStyle = colorStyle; // Use the color from fixedColors array
+        ctx.fillStyle = colorStyle; // Use transparent if image is set
         ctx.lineTo(centerX, centerY);
         ctx.fill();
         ctx.textAlign = "left";
