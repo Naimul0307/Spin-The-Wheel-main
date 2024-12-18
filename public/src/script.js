@@ -88,7 +88,15 @@ document.getElementById("bg-image").addEventListener("change", (event) => {
     }
 });
 
-// Function to draw the wheel with the dynamic background
+let borderColor = "#000000"; // Default border color (black)
+
+// Event listener for border color change
+document.getElementById("border-color").addEventListener("input", (event) => {
+    borderColor = event.target.value; // Update the border color
+    draw(); // Redraw the wheel with the new border color
+});
+
+// Function to draw the wheel with the dynamic background and border
 function draw() {
     ctx.clearRect(0, 0, width, height); // Clear the canvas
 
@@ -112,6 +120,13 @@ function draw() {
         ctx.fill();
     }
 
+    // Draw the wheel border with dynamic border color
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.lineWidth = 5; // Set the border width
+    ctx.strokeStyle = borderColor; // Use the dynamically set border color
+    ctx.stroke();
+
     if (items.length === 0 || items[0].trim() === "") {
         return; // Exit if no items
     }
@@ -133,6 +148,12 @@ function draw() {
         ctx.fillStyle = colorStyle; // Use transparent if image is set
         ctx.lineTo(centerX, centerY);
         ctx.fill();
+
+        // Draw the border around each slice with the dynamic border color
+        ctx.lineWidth = 2; // Set the slice border width
+        ctx.strokeStyle = borderColor; // Use the dynamically set border color
+        ctx.stroke();
+
         ctx.textAlign = "left";
 
         if (images[items[i]]) {
@@ -191,6 +212,8 @@ function draw() {
         }
     }
 }
+
+
 
 const spinSound = new Audio("../public/mp3/wheel-spin.mp3"); // Load the spin sound
 spinSound.loop = true; // Make the sound loop while the wheel is spinning
