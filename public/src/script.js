@@ -2,6 +2,37 @@ let userBackgroundImage = null; // Store the selected background image
 const fixedColors = ["#FF5733", "#33FF57", "#3357FF", "#FFD700", "#FF69B4"]; // Default colors
 
 
+// Variables to store the selected colors
+let centerCircleColor = "#FFFFFF"; // Default color
+let triangleColor = "#D89898"; // Default color
+
+// Event listener for center-circle color change
+document.getElementById("center-circle-color").addEventListener("input", (event) => {
+    centerCircleColor = event.target.value; // Update the center-circle color
+    updateWheelAppearance(); // Update the appearance of the wheel
+});
+
+// Event listener for triangle color change
+document.getElementById("triangle-color").addEventListener("input", (event) => {
+    triangleColor = event.target.value; // Update the triangle color
+    updateWheelAppearance(); // Update the appearance of the wheel
+});
+
+// Function to update the wheel appearance (including center circle and triangle)
+function updateWheelAppearance() {
+    // Update center circle color dynamically
+    const centerCircle = document.querySelector(".center-circle");
+    centerCircle.style.backgroundColor = centerCircleColor;
+
+    // Update triangle color dynamically
+    const triangle = document.querySelector(".triangle");
+    triangle.style.borderRightColor = triangleColor;
+
+    draw(); // Redraw the wheel with updated colors
+}
+
+
+
     // Update fixedColors array dynamically
     document.getElementById("color1").addEventListener("input", (event) => {
         fixedColors[0] = event.target.value;
@@ -28,21 +59,21 @@ const fixedColors = ["#FF5733", "#33FF57", "#3357FF", "#FFD700", "#FF69B4"]; // 
         draw(); // Redraw the wheel
     });
 
-function toRad(deg) {
-    return deg * (Math.PI / 180.0);
-}
+    function toRad(deg) {
+        return deg * (Math.PI / 180.0);
+    }
 
-function randomRange(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+    function randomRange(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-function easeOutSine(x) {
-    return Math.sin((x * Math.PI) / 2);
-}
+    function easeOutSine(x) {
+        return Math.sin((x * Math.PI) / 2);
+    }
 
-function getPercent(input, min, max) {
-    return (((input - min) * 100) / (max - min)) / 100;
-}
+    function getPercent(input, min, max) {
+        return (((input - min) * 100) / (max - min)) / 100;
+    }
 
 // Global Variables
 const canvas = document.getElementById("canvas");
