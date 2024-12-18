@@ -30,6 +30,11 @@
 <label for="center-circle-color">Center Circle Color:</label>
 <input type="color" id="center-circle-color" value="#FFFFFF">
 
+<!-- Input for changing center circle background -->
+<label for="center-circle-image">Upload Center Circle Image:</label>
+<input type="file" id="center-circle-image" accept="image/*">
+
+
 <!-- Input for changing triangle color -->
 <label for="triangle-color">Triangle Color:</label>
 <input type="color" id="triangle-color" value="#D89898">
@@ -60,7 +65,7 @@
     </div>
     
     <div class="wheel">
-        <canvas id="canvas" width="900" height="900"></canvas>
+        <canvas id="canvas" width="1000" height="1000"></canvas>
         <div class="center-circle" onclick="spin()">
             <div id="winner-display">
                 <p id="winner-text">NONE</p>

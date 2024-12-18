@@ -5,6 +5,19 @@ const fixedColors = ["#FF5733", "#33FF57", "#3357FF", "#FFD700", "#FF69B4"]; // 
 // Variables to store the selected colors
 let centerCircleColor = "#FFFFFF"; // Default color
 let triangleColor = "#D89898"; // Default color
+let centerCircleImage = null;
+
+document.getElementById("center-circle-image").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const img = new Image();
+        img.onload = () => {
+            centerCircleImage = img; // Store the uploaded image
+            updateWheelAppearance(); // Redraw the wheel with the new image
+        };
+        img.src = URL.createObjectURL(file); // Load the image
+    }
+});
 
 // Event listener for center-circle color change
 document.getElementById("center-circle-color").addEventListener("input", (event) => {
@@ -18,19 +31,26 @@ document.getElementById("triangle-color").addEventListener("input", (event) => {
     updateWheelAppearance(); // Update the appearance of the wheel
 });
 
-// Function to update the wheel appearance (including center circle and triangle)
 function updateWheelAppearance() {
-    // Update center circle color dynamically
     const centerCircle = document.querySelector(".center-circle");
-    centerCircle.style.backgroundColor = centerCircleColor;
 
-    // Update triangle color dynamically
+    if (centerCircleImage) {
+        // Clear background color and set image
+        centerCircle.style.backgroundColor = "transparent";
+        centerCircle.style.backgroundImage = `url('${centerCircleImage.src}')`;
+        centerCircle.style.backgroundSize = "cover";
+        centerCircle.style.backgroundPosition = "center";
+    } else {
+        // Use the selected color if no image is uploaded
+        centerCircle.style.backgroundImage = "none";
+        centerCircle.style.backgroundColor = centerCircleColor;
+    }
+
     const triangle = document.querySelector(".triangle");
     triangle.style.borderRightColor = triangleColor;
 
-    draw(); // Redraw the wheel with updated colors
+    draw(); // Redraw the wheel
 }
-
 
 
     // Update fixedColors array dynamically
@@ -75,6 +95,9 @@ function updateWheelAppearance() {
         return (((input - min) * 100) / (max - min)) / 100;
     }
 
+
+
+
 // Global Variables
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -82,7 +105,7 @@ const width = canvas.width;
 const height = canvas.height;
 const centerX = width / 2;
 const centerY = height / 2;
-const radius = width / 2;
+const radius = width / 2.01;
 
 let items = document.getElementById("itemTextarea").value.split("\n");
 let images = {}; // Store uploaded images
@@ -208,11 +231,9 @@ function draw() {
         ctx.fill();
 
         // Draw the border around each slice with the dynamic border color
-        ctx.lineWidth = 2; // Set the slice border width
+        ctx.lineWidth = 3; // Set the slice border width
         ctx.strokeStyle = borderColor; // Use the dynamically set border color
         ctx.stroke();
-
-        ctx.textAlign = "left";
 
         if (images[items[i]]) {
             const img = images[items[i]];
@@ -247,7 +268,7 @@ function draw() {
             ctx.save();
             ctx.translate(centerX, centerY);
             ctx.rotate(toRad((startDeg + endDeg) / 2));
-
+            ctx.textAlign = "left";
             ctx.font = `bold ${fontSize}px serif`;
             ctx.fillStyle = "#fff";
             ctx.fillText(items[i], radius * 0.5, 5);
