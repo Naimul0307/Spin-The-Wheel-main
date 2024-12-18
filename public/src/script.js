@@ -1,3 +1,4 @@
+let userBackgroundImage = null; // Store the selected background image
 
 const fixedColors = ["#FF5733", "#33FF57", "#3357FF", "#FFD700", "#FF69B4"];
 
@@ -43,33 +44,74 @@ function createWheel() {
     step = 360 / items.length;
     draw();
 }
+
 // Update the winner text/image display
 function updateWinnerDisplay(winner) {
-const winnerText = document.getElementById("winner-text");
-const winnerImage = document.getElementById("winner-image");
+    const winnerText = document.getElementById("winner-text");
+    const winnerImage = document.getElementById("winner-image");
 
-if (images[winner]) {
-// Display the image if the winner has an image
-winnerText.style.display = "none";
-winnerImage.style.display = "block";
-winnerImage.src = images[winner].src;
-} else {
-// Display the text if the winner has no image
-winnerText.style.display = "block";
-winnerImage.style.display = "none";
-winnerText.textContent = winner;
-}
+    if (images[winner]) {
+        // Display the image if the winner has an image
+        winnerText.style.display = "none";
+        winnerImage.style.display = "block";
+        winnerImage.src = images[winner].src;
+    } else {
+        // Display the text if the winner has no image
+        winnerText.style.display = "block";
+        winnerImage.style.display = "none";
+        winnerText.textContent = winner;
+    }
 }
 
+function getBackgroundColor() {
+    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color');
+    return bgColor.trim(); // Remove any extra spaces
+}
+
+// Function to handle background color selection
+document.getElementById("bg-color").addEventListener("input", (event) => {
+    const color = event.target.value;
+    document.documentElement.style.setProperty('--background-color', color); // Update CSS variable
+    userBackgroundImage = null; // Reset background image if color is selected
+    draw(); // Redraw the wheel with the new color
+});
+
+// Function to handle background image upload
+document.getElementById("bg-image").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const img = new Image();
+        img.onload = () => {
+            userBackgroundImage = img; // Set the image as the background
+            draw(); // Redraw the wheel with the image
+        };
+        img.src = URL.createObjectURL(file); // Set the image source
+    }
+});
+
+// Function to draw the wheel with the dynamic background
 function draw() {
     ctx.clearRect(0, 0, width, height); // Clear the canvas
 
-    // Draw the background (light color)
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, toRad(0), toRad(360));
-    ctx.fillStyle = `rgb(240, 202, 202)`; // Default background color
-    ctx.lineTo(centerX, centerY);
-    ctx.fill();
+    // Draw the background (image or color)
+    if (userBackgroundImage) {
+        // Only draw the background image inside the circular wheel
+        ctx.save(); // Save the current context state
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
+        ctx.clip(); // Clip the drawing to the circular area
+
+        // Draw the image inside the wheel's clipped region
+        ctx.drawImage(userBackgroundImage, centerX - radius, centerY - radius, radius * 2, radius * 2);
+        ctx.restore(); // Restore the context to its original state
+    } else {
+        // Draw the background color if no image is selected
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
+        ctx.fillStyle = getBackgroundColor(); // Get the background color from CSS
+        ctx.lineTo(centerX, centerY);
+        ctx.fill();
+    }
 
     if (items.length === 0 || items[0].trim() === "") {
         return; // Exit if no items
@@ -93,29 +135,30 @@ function draw() {
         if (images[items[i]]) {
             const img = images[items[i]];
 
-            // Save the context and clip to the slice
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.arc(centerX, centerY, radius, toRad(startDeg), toRad(endDeg));
-            ctx.closePath();
-            ctx.clip();
+            // Calculate the slice angle
+            const sliceAngle = toRad(endDeg - startDeg); // Slice angle in radians
+            const sliceRadius = radius * 0.8; // Slight padding to fit within the slice
+            const maxSliceWidth = sliceRadius * Math.sin(sliceAngle / 2); // Max width of the slice
+            const maxSliceHeight = sliceRadius * 0.6; // Adjusted height to avoid overlapping
 
-            // Calculate slice angle and image size dynamically
-            const sliceAngle = endDeg - startDeg; // Slice angle in degrees
-            const sliceRadius = radius * 0.9; // Padding to prevent overflow
-            const imgSize = sliceRadius * Math.sin(toRad(sliceAngle / 2)) * 0.7; // Adjust size based on angle
+            // Scale the image to fit within the slice dimensions
+            const scale = Math.min(maxSliceWidth / img.width, maxSliceHeight / img.height);
+            const imgWidth = img.width * scale;
+            const imgHeight = img.height * scale;
 
-            // Calculate the position for centering the image in the slice
-            const angleMid = toRad((startDeg + endDeg) / 2); // Midpoint of the slice
-            const imgX = centerX + Math.cos(angleMid) * sliceRadius * 0.6 - imgSize / 2;
-            const imgY = centerY + Math.sin(angleMid) * sliceRadius * 0.6 - imgSize / 2;
+            // Calculate the position for centering the image within the slice
+            const angleMid = toRad((startDeg + endDeg) / 2); // Midpoint angle
+            const imgX = centerX + Math.cos(angleMid) * (sliceRadius - imgHeight / 2) - imgWidth / 2;
+            const imgY = centerY + Math.sin(angleMid) * (sliceRadius - imgHeight / 2) - imgHeight / 2;
 
             // Draw the image
-            ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
-
-            ctx.restore(); // Restore clipping
+            ctx.save();
+            ctx.translate(imgX + imgWidth / 2, imgY + imgHeight / 2); // Move to the center of the image
+            ctx.rotate(angleMid); // Align image with the slice angle
+            ctx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
+            ctx.restore();
         } else {
+            // Fallback to draw text (unchanged)
             const sliceAngle = endDeg - startDeg;
             const fontSize = Math.max(10, Math.min(30, sliceAngle * 0.5));
 

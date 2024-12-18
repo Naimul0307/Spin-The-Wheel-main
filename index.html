@@ -9,7 +9,18 @@
 </head>
 <body>
     <div class="inputArea">
+        <!-- Input for text items -->
         <textarea id="itemTextarea"></textarea>
+        <!-- Input for selecting background color -->
+        <label for="bg-color">Choose Background Color:</label>
+        <input type="color" id="bg-color" name="bg-color" value="#f0caca">
+        
+        <!-- Input for uploading background image -->
+        <label for="bg-image">Upload Background Image:</label>
+        <input type="file" id="bg-image" name="bg-image" accept="image/*">
+        
+        
+        <!-- Input for uploading images for items -->
         <input type="file" id="imageUpload" multiple accept="image/*" onchange="handleImageUpload()">
     </div>
     
