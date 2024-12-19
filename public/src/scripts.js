@@ -95,9 +95,6 @@ function updateWheelAppearance() {
         return (((input - min) * 100) / (max - min)) / 100;
     }
 
-
-
-
 // Global Variables
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -242,49 +239,18 @@ function draw() {
             ctx.rotate(angleMid); // Align image with the slice angle
             ctx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
             ctx.restore();
-        }
-         else {
+        } else {
+            // Fallback to draw text (unchanged)
             const sliceAngle = endDeg - startDeg;
-            const fontSize = Math.max(10, Math.min(40, sliceAngle * 1));
-            const lineHeight = fontSize + 5; // Adjust spacing between lines
-            
-            // Save context state
+            const fontSize = Math.max(10, Math.min(30, sliceAngle * 0.5));
+
             ctx.save();
-            
-            // Create a clipping region for the slice
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY); // Start at the center of the wheel
-            ctx.arc(
-                centerX,
-                centerY,
-                radius * 0.95, // Slightly smaller than the wheel's radius
-                toRad(startDeg), // Start angle of the slice
-                toRad(endDeg)    // End angle of the slice
-            );
-            ctx.closePath(); // Close the arc to form a wedge shape
-            ctx.clip();
-            
-            // Translate and rotate to draw text within the slice
             ctx.translate(centerX, centerY);
-            ctx.rotate(toRad((startDeg + endDeg) / 2)); // Rotate to align text with the slice
-            const textOffsetY = 1; // Adjust this value to move the text slightly to the right
-            ctx.translate(textOffsetY, 2);
-            ctx.textAlign = "center";
+            ctx.rotate(toRad((startDeg + endDeg) / 2));
+            ctx.textAlign = "left";
             ctx.font = `bold ${fontSize}px serif`;
             ctx.fillStyle = "#fff";
-            
-            // Split text into multiple lines
-            const lines = items[i].split('\n'); // Use "\n" in items[i] for multiline text
-            
-            // Draw each line of text
-            lines.forEach((line, index) => {
-                const yPosition = index * lineHeight - (lines.length - 1) * lineHeight / 2;
-                if (yPosition + radius * 0.5 < radius * 0.95) { // Ensure text stays within the slice
-                    ctx.fillText(line, radius * 0.5, yPosition);
-                }
-            });
-            
-            // Restore context state
+            ctx.fillText(items[i], radius * 0.5, 5);
             ctx.restore();
         }
 
@@ -293,11 +259,17 @@ function draw() {
             endDeg: endDeg,
         };
 
-
+        //Check Winner and Update the Display
+        // if (
+        //     startDeg % 360 < 360 &&
+        //     startDeg % 360 > 270 &&
+        //     endDeg % 360 > 0 &&
+        //     endDeg % 360 < 90
+        // ) {
+        //     updateWinnerDisplay(items[i]); // Update winner display with image or text
+        // }
     }
 }
-
-
 
 const spinSound = new Audio("../public/mp3/wheel-spin.mp3"); // Load the spin sound
 spinSound.loop = true; // Make the sound loop while the wheel is spinning
@@ -307,92 +279,55 @@ let speed = 0;
 let maxRotation = randomRange(360 * 3, 360 * 6);
 let pause = false;
 let winner = null;;
-// Function to determine the winner
-function determineWinner() {
-    // Normalize the currentDeg to 0-360 degrees
-    const normalizedAngle = currentDeg % 360;
-    
-    // Find the winning item based on the angle
-    const winningItem = Object.keys(itemDegs).find((item) => {
-        const { startDeg, endDeg } = itemDegs[item];
-        const normalizedStart = startDeg % 360;
-        const normalizedEnd = endDeg % 360;
 
-        return (
-            (normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd) ||
-            (normalizedEnd < normalizedStart && (normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd))
-        );
-    });
-
-    // Display the winner
-    showWinnerPopup(winningItem);
-}
-
-// Function to show the winner
-function showWinnerPopup(winner) {
-    const winnerText = document.getElementById("winner-popup-text");
-    const winnerImage = document.getElementById("winner-popup-image");
+//Update the winner text/image display
+function updateWinnerDisplay(winner) {
+    const winnerText = document.getElementById("winner-text");
+    const winnerImage = document.getElementById("winner-image");
 
     if (images[winner]) {
+        // Display the image if the winner has an image
         winnerText.style.display = "none";
         winnerImage.style.display = "block";
         winnerImage.src = images[winner].src;
     } else {
-        winnerImage.style.display = "none";
+        // Display the text if the winner has no image
         winnerText.style.display = "block";
+        winnerImage.style.display = "none";
         winnerText.textContent = winner;
     }
-
-    const modal = document.getElementById("winnerModal");
-    modal.style.display = "flex";
 }
 
-// Function to close the winner modal
-function closeWinnerModal() {
-    const modal = document.getElementById("winnerModal");
-    modal.style.display = "none";
-}
-
-// Modified animate function to trigger winner determination on spin completion
 function animate() {
     if (pause) {
         spinSound.pause(); // Stop the sound when spinning ends
         spinSound.currentTime = 0; // Reset the sound to the start
-        
-        // After the spin ends, determine the winner
-        determineWinner();
         return;
     }
-
     speed = easeOutSine(getPercent(currentDeg, maxRotation, 0)) * 20;
     if (speed < 0.01) {
         speed = 0;
-        pause = true; // Pause the spin when it's close to the end
+        pause = true;
     }
-
     currentDeg += speed;
     draw();
-    window.requestAnimationFrame(animate); // Keep animating
+    window.requestAnimationFrame(animate);
 }
 
-// Spin the wheel and start the animation
 function spin() {
     if (speed !== 0) {
         return; // Prevent starting a new spin if one is already in progress
     }
-    
-    // Reset the wheel for a new spin
     maxRotation = 0;
     currentDeg = 0;
     createWheel();
     draw();
 
-    // Set a random rotation range for the spin
     maxRotation = randomRange(360 * 3, 360 * 6);
     pause = false;
     
     spinSound.play(); // Start the sound when the wheel starts spinning
-    window.requestAnimationFrame(animate); // Start the animation
+    window.requestAnimationFrame(animate);
 }
 
 

@@ -64,6 +64,8 @@
         </div>
     </div>
     
+
+
     <div class="wheel">
         <canvas id="canvas" width="1000" height="1000"></canvas>
         <div class="center-circle" onclick="spin()">
@@ -73,6 +75,17 @@
             </div>
         </div>        
         <div class="triangle"></div>
+    </div>
+
+    <!-- Winner Popup Modal -->
+    <div id="winnerModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeWinnerModal()">&times;</span>
+            <div id="winner-popup-content">
+                <p id="winner-popup-text" style="display: none;"></p>
+                <img id="winner-popup-image" style="display: none; max-width: 100%;" alt="Winner">
+            </div>
+        </div>
     </div>
     <script src="public/src/script.js"></script>
 </body>
