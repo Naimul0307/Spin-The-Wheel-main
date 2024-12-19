@@ -95,36 +95,6 @@ function updateWheelAppearance() {
         return (((input - min) * 100) / (max - min)) / 100;
     }
 
-
-
-
-// Global Variables
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const width = canvas.width;
-const height = canvas.height;
-const centerX = width / 2;
-const centerY = height / 2;
-const radius = width / 2.01;
-
-let items = document.getElementById("itemTextarea").value.split("\n");
-let images = {}; // Store uploaded images
-let currentDeg = 0;
-let step = 360 / items.length;
-let itemDegs = {};
-
-// Event Listener for Text Input Updates
-document.getElementById("itemTextarea").addEventListener("input", () => {
-    createWheel();
-});
-
-// Create Wheel
-function createWheel() {
-    items = document.getElementById("itemTextarea").value.split("\n").filter((item) => item.trim() !== "");
-    step = 360 / items.length;
-    draw();
-}
-
 function getBackgroundColor() {
     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color');
     return bgColor.trim(); // Remove any extra spaces
@@ -158,6 +128,33 @@ document.getElementById("border-color").addEventListener("input", (event) => {
     borderColor = event.target.value; // Update the border color
     draw(); // Redraw the wheel with the new border color
 });
+
+// Global Variables
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const width = canvas.width;
+const height = canvas.height;
+const centerX = width / 2;
+const centerY = height / 2;
+const radius = width / 2.01;
+
+let items = document.getElementById("itemTextarea").value.split("\n");
+let images = {}; // Store uploaded images
+let currentDeg = 0;
+let step = 360 / items.length;
+let itemDegs = {};
+
+// Event Listener for Text Input Updates
+document.getElementById("itemTextarea").addEventListener("input", () => {
+    createWheel();
+});
+
+// Create Wheel
+function createWheel() {
+    items = document.getElementById("itemTextarea").value.split("\n").filter((item) => item.trim() !== "");
+    step = 360 / items.length;
+    draw();
+}
 
 // Function to draw the wheel with the dynamic background and border
 function draw() {
@@ -303,15 +300,20 @@ const spinSound = new Audio("../public/mp3/wheel-spin.mp3"); // Load the spin so
 spinSound.loop = true; // Make the sound loop while the wheel is spinning
 
 // Spin Wheel
+let isSpinning = false; 
 let speed = 0;
 let maxRotation = randomRange(360 * 3, 360 * 6);
 let pause = false;
 let winner = null;;
-// Function to determine the winner
+
 function determineWinner() {
+    if (!isSpinning) {
+        return; // Do not determine winner if the wheel hasn't been spun
+    }
+
     // Normalize the currentDeg to 0-360 degrees
     const normalizedAngle = currentDeg % 360;
-    
+
     // Find the winning item based on the angle
     const winningItem = Object.keys(itemDegs).find((item) => {
         const { startDeg, endDeg } = itemDegs[item];
@@ -353,7 +355,7 @@ function closeWinnerModal() {
     modal.style.display = "none";
 }
 
-// Modified animate function to trigger winner determination on spin completion
+
 function animate() {
     if (pause) {
         spinSound.pause(); // Stop the sound when spinning ends
@@ -361,6 +363,10 @@ function animate() {
         
         // After the spin ends, determine the winner
         determineWinner();
+        
+        // Reset the spinning flag after spin ends
+        isSpinning = false;
+
         return;
     }
 
@@ -375,12 +381,15 @@ function animate() {
     window.requestAnimationFrame(animate); // Keep animating
 }
 
-// Spin the wheel and start the animation
+// Modify the spin function to set the flag
 function spin() {
     if (speed !== 0) {
         return; // Prevent starting a new spin if one is already in progress
     }
-    
+
+    // Set the flag to indicate the spin has started
+    isSpinning = true;
+
     // Reset the wheel for a new spin
     maxRotation = 0;
     currentDeg = 0;

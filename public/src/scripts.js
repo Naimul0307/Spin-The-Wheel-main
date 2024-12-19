@@ -31,27 +31,6 @@ document.getElementById("triangle-color").addEventListener("input", (event) => {
     updateWheelAppearance(); // Update the appearance of the wheel
 });
 
-function updateWheelAppearance() {
-    const centerCircle = document.querySelector(".center-circle");
-
-    if (centerCircleImage) {
-        // Clear background color and set image
-        centerCircle.style.backgroundColor = "transparent";
-        centerCircle.style.backgroundImage = `url('${centerCircleImage.src}')`;
-        centerCircle.style.backgroundSize = "cover";
-        centerCircle.style.backgroundPosition = "center";
-    } else {
-        // Use the selected color if no image is uploaded
-        centerCircle.style.backgroundImage = "none";
-        centerCircle.style.backgroundColor = centerCircleColor;
-    }
-
-    const triangle = document.querySelector(".triangle");
-    triangle.style.borderRightColor = triangleColor;
-
-    draw(); // Redraw the wheel
-}
-
 
     // Update fixedColors array dynamically
     document.getElementById("color1").addEventListener("input", (event) => {
@@ -95,32 +74,7 @@ function updateWheelAppearance() {
         return (((input - min) * 100) / (max - min)) / 100;
     }
 
-// Global Variables
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const width = canvas.width;
-const height = canvas.height;
-const centerX = width / 2;
-const centerY = height / 2;
-const radius = width / 2.01;
 
-let items = document.getElementById("itemTextarea").value.split("\n");
-let images = {}; // Store uploaded images
-let currentDeg = 0;
-let step = 360 / items.length;
-let itemDegs = {};
-
-// Event Listener for Text Input Updates
-document.getElementById("itemTextarea").addEventListener("input", () => {
-    createWheel();
-});
-
-// Create Wheel
-function createWheel() {
-    items = document.getElementById("itemTextarea").value.split("\n").filter((item) => item.trim() !== "");
-    step = 360 / items.length;
-    draw();
-}
 
 function getBackgroundColor() {
     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color');
@@ -150,11 +104,62 @@ document.getElementById("bg-image").addEventListener("change", (event) => {
 
 let borderColor = "#000000"; // Default border color (black)
 
+function updateWheelAppearance() {
+    const centerCircle = document.querySelector(".center-circle");
+
+    if (centerCircleImage) {
+        // Clear background color and set image
+        centerCircle.style.backgroundColor = "transparent";
+        centerCircle.style.backgroundImage = `url('${centerCircleImage.src}')`;
+        centerCircle.style.backgroundSize = "cover";
+        centerCircle.style.backgroundPosition = "center";
+    } else {
+        // Use the selected color if no image is uploaded
+        centerCircle.style.backgroundImage = "none";
+        centerCircle.style.backgroundColor = centerCircleColor;
+    }
+
+    const triangle = document.querySelector(".triangle");
+    triangle.style.borderRightColor = triangleColor;
+
+    draw(); // Redraw the wheel
+}
+
 // Event listener for border color change
 document.getElementById("border-color").addEventListener("input", (event) => {
     borderColor = event.target.value; // Update the border color
     draw(); // Redraw the wheel with the new border color
 });
+
+// Global Variables
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const width = canvas.width;
+const height = canvas.height;
+const centerX = width / 2;
+const centerY = height / 2;
+const radius = width / 2.01;
+
+let items = document.getElementById("itemTextarea").value.split("\n");
+let images = {}; // Store uploaded images
+let currentDeg = 0;
+let step = 360 / items.length;
+let itemDegs = {};
+let shouldUpdateWinner = true; 
+
+// Event Listener for Text Input Updates
+document.getElementById("itemTextarea").addEventListener("input", () => {
+    shouldUpdateWinner = false; // Disable winner update when updating the items
+    createWheel();
+    shouldUpdateWinner = true; // Re-enable winner update after creating the wheel
+});
+
+// Create Wheel
+function createWheel() {
+    items = document.getElementById("itemTextarea").value.split("\n").filter((item) => item.trim() !== "");
+    step = 360 / items.length;
+    draw();
+}
 
 // Function to draw the wheel with the dynamic background and border
 function draw() {
@@ -259,15 +264,10 @@ function draw() {
             endDeg: endDeg,
         };
 
-        //Check Winner and Update the Display
-        // if (
-        //     startDeg % 360 < 360 &&
-        //     startDeg % 360 > 270 &&
-        //     endDeg % 360 > 0 &&
-        //     endDeg % 360 < 90
-        // ) {
-        //     updateWinnerDisplay(items[i]); // Update winner display with image or text
-        // }
+        // Only update the winner if the flag is set
+        if (shouldUpdateWinner && startDeg % 360 < 360 && startDeg % 360 > 270 && endDeg % 360 > 0 && endDeg % 360 < 90) {
+            updateWinnerDisplay(items[i]); // Update winner display with image or text
+        }
     }
 }
 
@@ -275,9 +275,10 @@ const spinSound = new Audio("../public/mp3/wheel-spin.mp3"); // Load the spin so
 spinSound.loop = true; // Make the sound loop while the wheel is spinning
 
 // Spin Wheel
+let isSpinning = false; 
 let speed = 0;
 let maxRotation = randomRange(360 * 3, 360 * 6);
-let pause = false;
+let pause = true;
 let winner = null;;
 
 //Update the winner text/image display
@@ -302,34 +303,49 @@ function animate() {
     if (pause) {
         spinSound.pause(); // Stop the sound when spinning ends
         spinSound.currentTime = 0; // Reset the sound to the start
+        
+        // After the spin ends, determine the winner
+        determineWinner();
+        
+        // Reset the spinning flag after spin ends
+        isSpinning = false;
+
         return;
     }
+
     speed = easeOutSine(getPercent(currentDeg, maxRotation, 0)) * 20;
     if (speed < 0.01) {
         speed = 0;
-        pause = true;
+        pause = true; // Pause the spin when it's close to the end
     }
+
     currentDeg += speed;
     draw();
-    window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(animate); // Keep animating
 }
 
+// Modify the spin function to set the flag
 function spin() {
     if (speed !== 0) {
         return; // Prevent starting a new spin if one is already in progress
     }
+
+    // Set the flag to indicate the spin has started
+    isSpinning = true;
+
+    // Reset the wheel for a new spin
     maxRotation = 0;
     currentDeg = 0;
     createWheel();
     draw();
 
+    // Set a random rotation range for the spin
     maxRotation = randomRange(360 * 3, 360 * 6);
     pause = false;
     
     spinSound.play(); // Start the sound when the wheel starts spinning
-    window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(animate); // Start the animation
 }
-
 
 // Handle Image Upload
 function handleImageUpload() {
