@@ -84,7 +84,7 @@ function getBackgroundColor() {
 // Function to handle background color selection
 document.getElementById("bg-color").addEventListener("input", (event) => {
     const color = event.target.value;
-    document.documentElement.style.setProperty('--background-color', color); // Update CSS variable
+    document.documentElement.style.setProperty('--background-color', color);
     userBackgroundImage = null; // Reset background image if color is selected
     draw(); // Redraw the wheel with the new color
 });
@@ -167,17 +167,13 @@ function draw() {
 
     // Draw the background (image or color)
     if (userBackgroundImage) {
-        // Only draw the background image inside the circular wheel
         ctx.save(); // Save the current context state
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
         ctx.clip(); // Clip the drawing to the circular area
-
-        // Draw the image inside the wheel's clipped region
         ctx.drawImage(userBackgroundImage, centerX - radius, centerY - radius, radius * 2, radius * 2);
         ctx.restore(); // Restore the context to its original state
     } else {
-        // Draw the background color if no image is selected
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
         ctx.fillStyle = getBackgroundColor(); // Get the background color from CSS
@@ -301,67 +297,98 @@ function updateWinnerDisplay(winner) {
 
 function animate() {
     if (pause) {
-        spinSound.pause(); // Stop the sound when spinning ends
-        spinSound.currentTime = 0; // Reset the sound to the start
-        
-        // After the spin ends, determine the winner
-        determineWinner();
-        
-        // Reset the spinning flag after spin ends
-        isSpinning = false;
-
-        return;
+        if (isSpinning) {
+            spinSound.pause(); // Stop the sound when spinning ends
+            spinSound.currentTime = 0; // Reset the sound to the start
+            determineWinner(); // Determine the winner after spinning ends
+            isSpinning = false; // Reset the spinning flag
+        }
+        return; // Exit the animation loop, no further updates until user clicks again
     }
 
+    // Calculate the speed based on easing
     speed = easeOutSine(getPercent(currentDeg, maxRotation, 0)) * 20;
     if (speed < 0.01) {
-        speed = 0;
-        pause = true; // Pause the spin when it's close to the end
+        speed = 0; // Set speed to zero when it is negligible
+        pause = true; // Stop the animation when speed is low
     }
 
-    currentDeg += speed;
-    draw();
-    window.requestAnimationFrame(animate); // Keep animating
+    currentDeg += speed; // Increment the rotation degree
+    draw(); // Redraw the wheel
+
+    if (speed <= 0) {
+        spinSound.pause(); // Pause the sound when the animation is done
+    }
+
+    window.requestAnimationFrame(animate); // Continue the animation loop
 }
 
-// Modify the spin function to set the flag
 function spin() {
-    if (speed !== 0) {
+    if (isSpinning) {
         return; // Prevent starting a new spin if one is already in progress
     }
 
-    // Set the flag to indicate the spin has started
+    // Reset states for a new spin
     isSpinning = true;
-
-    // Reset the wheel for a new spin
-    maxRotation = 0;
+    maxRotation = randomRange(360 * 3, 360 * 6); // Set a random maximum rotation
     currentDeg = 0;
-    createWheel();
-    draw();
-
-    // Set a random rotation range for the spin
-    maxRotation = randomRange(360 * 3, 360 * 6);
     pause = false;
-    
-    spinSound.play(); // Start the sound when the wheel starts spinning
-    window.requestAnimationFrame(animate); // Start the animation
+
+    spinSound.play(); // Play the spinning sound
+    window.requestAnimationFrame(animate); // Start the animation loop
 }
+
+// Function to open the winner popup modal and display the winner
+function openWinnerModal(winner) {
+    const winnerText = document.getElementById("winner-popup-text");
+    const winnerImage = document.getElementById("winner-popup-image");
+
+    // Set the winner text/image in the modal
+    if (images[winner]) {
+        winnerText.style.display = "none";
+        winnerImage.style.display = "block";
+        winnerImage.src = images[winner].src;
+    } else {
+        winnerText.style.display = "block";
+        winnerImage.style.display = "none";
+        winnerText.textContent = winner;
+    }
+
+    // Display the modal
+    const winnerModal = document.getElementById("winnerModal");
+    winnerModal.style.display = "block";
+}
+
+// Function to close the winner popup modal
+function closeWinnerModal() {
+    const winnerModal = document.getElementById("winnerModal");
+    winnerModal.style.display = "none";
+}
+
+function determineWinner() {
+    const winnerIndex = Math.floor((currentDeg % 360) / step); // Calculate the index of the winner
+    winner = items[winnerIndex]; // Get the winner's name
+    updateWinnerDisplay(winner); // Update the winner display on the wheel
+    openWinnerModal(winner); // Optionally, open a modal to display the winner
+}
+
+
 
 // Handle Image Upload
 function handleImageUpload() {
     const files = document.getElementById("imageUpload").files;
-
     Array.from(files).forEach((file) => {
         const img = new Image();
-        const itemName = file.name.split(".")[0];
+        const itemName = file.name.split(".")[0]; // Extract item name from file name
         img.onload = () => {
             images[itemName] = img;
-            updateTextareaWithImages();
-            createWheel();
+            updateTextareaWithImages(); // Update the textarea with image names
+            createWheel(); // Redraw the wheel with updated images
         };
         img.src = URL.createObjectURL(file);
     });
 }
+
 
 function updateTextareaWithImages() {
     const textarea = document.getElementById("itemTextarea");
