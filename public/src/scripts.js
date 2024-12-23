@@ -74,7 +74,9 @@ document.getElementById("triangle-color").addEventListener("input", (event) => {
         return (((input - min) * 100) / (max - min)) / 100;
     }
 
-
+    function normalizeDegrees(deg) {
+        return ((deg % 360) + 360) % 360; // Ensures the value is within 0-360
+    }
 
 function getBackgroundColor() {
     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color');
@@ -300,10 +302,10 @@ function animate() {
         if (isSpinning) {
             spinSound.pause(); // Stop the sound when spinning ends
             spinSound.currentTime = 0; // Reset the sound to the start
-            determineWinner(); // Determine the winner after spinning ends
-            isSpinning = false; // Reset the spinning flag
+            isSpinning = false;
+            determineWinner();
         }
-        return; // Exit the animation loop, no further updates until user clicks again
+        return;
     }
 
     // Calculate the speed based on easing
@@ -312,7 +314,7 @@ function animate() {
         speed = 0; // Set speed to zero when it is negligible
         pause = true; // Stop the animation when speed is low
     }
-
+    
     currentDeg += speed; // Increment the rotation degree
     draw(); // Redraw the wheel
 
@@ -331,7 +333,6 @@ function spin() {
     // Reset states for a new spin
     isSpinning = true;
     maxRotation = randomRange(360 * 3, 360 * 6); // Set a random maximum rotation
-    currentDeg = 0;
     pause = false;
 
     spinSound.play(); // Play the spinning sound
@@ -365,13 +366,20 @@ function closeWinnerModal() {
     winnerModal.style.display = "none";
 }
 
+// function determineWinner() {
+//     const winnerIndex = Math.floor((currentDeg % 360) / step); // Calculate the index of the winner
+//     winner = items[winnerIndex]; // Get the winner's name
+//     updateWinnerDisplay(winner); // Update the winner display on the wheel
+//     openWinnerModal(winner); // Optionally, open a modal to display the winner
+// }
+
 function determineWinner() {
-    const winnerIndex = Math.floor((currentDeg % 360) / step); // Calculate the index of the winner
+    const normalizedDeg = normalizeDegrees(currentDeg);
+    const winnerIndex = Math.floor((360 - normalizedDeg) / step) % items.length; // Use (360 - normalizedDeg) to account for clockwise rotation
     winner = items[winnerIndex]; // Get the winner's name
     updateWinnerDisplay(winner); // Update the winner display on the wheel
     openWinnerModal(winner); // Optionally, open a modal to display the winner
 }
-
 
 
 // Handle Image Upload
