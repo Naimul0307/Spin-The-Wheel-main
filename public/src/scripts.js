@@ -1,3 +1,19 @@
+// Toggle visibility of the input area when the button is clicked
+document.getElementById("showInputButton").addEventListener("click", () => {
+    const inputArea = document.querySelector(".inputArea");
+    const currentDisplay = inputArea.style.display;
+    
+    // Toggle between showing and hiding the input area
+    if (currentDisplay === "none" || currentDisplay === "") {
+        inputArea.style.display = "block";
+        document.getElementById("showInputButton").textContent = "Hide Input Area";
+    } else {
+        inputArea.style.display = "none";
+        document.getElementById("showInputButton").textContent = "Show Input Area";
+    }
+});
+
+
 let userBackgroundImage = null; // Store the selected background image
 const fixedColors = ["#FF5733", "#33FF57", "#3357FF", "#FFD700", "#FF69B4"]; // Default colors
 
@@ -297,24 +313,42 @@ function updateWinnerDisplay(winner) {
     }
 }
 
+function spin() {
+    if (isSpinning) {
+        return; // Prevent starting a new spin if one is already in progress
+    }
+
+    // Reset states for a new spin
+    isSpinning = true;
+    currentDeg = 0; // Reset the current rotation to start fresh
+    speed = randomRange(20, 50); // Start with a random initial speed
+    maxRotation = randomRange(360 * 3, 360 * 6); // Set a random maximum rotation
+    pause = false;
+
+    spinSound.play(); // Play the spinning sound
+    window.requestAnimationFrame(animate); // Start the animation loop
+}
+
 function animate() {
     if (pause) {
         if (isSpinning) {
             spinSound.pause(); // Stop the sound when spinning ends
             spinSound.currentTime = 0; // Reset the sound to the start
             isSpinning = false;
-            determineWinner();
+            determineWinner(); // Determine the winner after the spin stops
         }
         return;
     }
 
     // Calculate the speed based on easing
-    speed = easeOutSine(getPercent(currentDeg, maxRotation, 0)) * 20;
+    const percentComplete = getPercent(currentDeg, maxRotation, 0);
+    speed = easeOutSine(percentComplete) * 20;
+
     if (speed < 0.01) {
-        speed = 0; // Set speed to zero when it is negligible
-        pause = true; // Stop the animation when speed is low
+        speed = 0; // Stop the wheel when speed is negligible
+        pause = true; // End the animation
     }
-    
+
     currentDeg += speed; // Increment the rotation degree
     draw(); // Redraw the wheel
 
@@ -325,20 +359,7 @@ function animate() {
     window.requestAnimationFrame(animate); // Continue the animation loop
 }
 
-function spin() {
-    if (isSpinning) {
-        return; // Prevent starting a new spin if one is already in progress
-    }
-
-    // Reset states for a new spin
-    isSpinning = true;
-    maxRotation = randomRange(360 * 3, 360 * 6); // Set a random maximum rotation
-    pause = false;
-
-    spinSound.play(); // Play the spinning sound
-    window.requestAnimationFrame(animate); // Start the animation loop
-}
-
+//
 // Function to open the winner popup modal and display the winner
 function openWinnerModal(winner) {
     const winnerText = document.getElementById("winner-popup-text");
@@ -366,13 +387,7 @@ function closeWinnerModal() {
     winnerModal.style.display = "none";
 }
 
-// function determineWinner() {
-//     const winnerIndex = Math.floor((currentDeg % 360) / step); // Calculate the index of the winner
-//     winner = items[winnerIndex]; // Get the winner's name
-//     updateWinnerDisplay(winner); // Update the winner display on the wheel
-//     openWinnerModal(winner); // Optionally, open a modal to display the winner
-// }
-
+//
 function determineWinner() {
     const normalizedDeg = normalizeDegrees(currentDeg);
     const winnerIndex = Math.floor((360 - normalizedDeg) / step) % items.length; // Use (360 - normalizedDeg) to account for clockwise rotation
