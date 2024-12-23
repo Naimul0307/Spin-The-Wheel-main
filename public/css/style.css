@@ -21,7 +21,7 @@ html, body {
 
 textarea {
     width: 100%; /* Full width of the input area */
-    height: calc(32vh - 40px); /* Adjust height to fit the viewport */
+    height: calc(32vh - 90px); /* Adjust height to fit the viewport */
     background-color: rgba(20, 20, 20, 0.2);
     caret-color: #fff;
     resize: none;
@@ -30,6 +30,7 @@ textarea {
     padding: 10px;
     font-size: 16px;
     border-radius: 5px;
+    margin-bottom: 2px;
 }
 
 .content {
