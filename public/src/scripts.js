@@ -179,110 +179,6 @@ function createWheel() {
     draw();
 }
 
-
-// function draw() {
-//     ctx.clearRect(0, 0, width, height); // Clear the canvas
-
-//     // Draw the background (image or color)
-//     if (userBackgroundImage) {
-//         ctx.save();
-//         ctx.beginPath();
-//         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
-//         ctx.clip();
-//         ctx.drawImage(userBackgroundImage, centerX - radius, centerY - radius, radius * 2, radius * 2);
-//         ctx.restore();
-//     } else {
-//         ctx.beginPath();
-//         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
-//         ctx.fillStyle = getBackgroundColor(); // Get the background color from CSS
-//         ctx.fill();
-//     }
-
-//     // Draw the wheel border with dynamic border color
-//     ctx.beginPath();
-//     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-//     ctx.lineWidth = 5; // Set the border width
-//     ctx.strokeStyle = borderColor; // Use the dynamically set border color
-//     ctx.stroke();
-
-//     if (items.length === 0 || items[0].trim() === "") {
-//         return; // Exit if no items
-//     }
-
-//     let startDeg = currentDeg; // Start angle for segments
-//     for (let i = 0; i < items.length; i++, startDeg += step) {
-//         const endDeg = startDeg + step;
-
-//         // Begin slice path
-//         ctx.beginPath();
-//         ctx.moveTo(centerX, centerY);
-//         ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
-//         ctx.closePath();
-
-//         // Draw slice background (image or color)
-//         if (images[items[i]]) {
-//             ctx.save();
-//             ctx.clip();
-
-//             // Rotate and position the image within the slice
-//             const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
-//             const imgWidth = radius; // Set the image width to the radius of the wheel
-//             const imgHeight = radius; // Set the image height to the radius of the wheel
-
-//             ctx.translate(centerX, centerY); // Move to the center of the wheel
-//             ctx.rotate(toRad(sliceAngle)); // Rotate to align with the slice
-//             ctx.drawImage(images[items[i]], 0, -imgHeight / 2, imgWidth, imgHeight);
-//             ctx.restore();
-//         } else {
-//             ctx.fillStyle = fixedColors[i % fixedColors.length];
-//             ctx.fill();
-//         }
-
-//         // Clip to the slice for text drawing
-//         ctx.save();
-//         ctx.clip();
-
-//         // Draw text inside the slice
-//         const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
-//         const text = items[i];
-//         const fontSize = Math.min(20, radius / 10); // Dynamically calculate font size
-//         ctx.font = `bold ${fontSize}px serif`;
-//         ctx.textAlign = "center";
-//         ctx.textBaseline = "middle";
-
-//         ctx.translate(centerX, centerY); // Move to the center of the wheel
-//         ctx.rotate(toRad(sliceAngle)); // Rotate to align with the slice
-//         ctx.fillStyle = "#fff";
-
-//         // Calculate position and ensure text stays within the slice
-//         const textRadius = radius * 0.7; // Adjust text position (closer to the center)
-//         ctx.fillText(text, textRadius, 0);
-
-//         ctx.restore(); // Restore to remove clipping
-
-//         // Draw the border around each slice
-//         ctx.lineWidth = 3; // Set the slice border width
-//         ctx.strokeStyle = borderColor; // Use the dynamically set border color
-//         ctx.stroke();
-
-//         itemDegs[items[i]] = {
-//             startDeg: startDeg,
-//             endDeg: endDeg,
-//         };
-
-//         // Update winner display if the flag is set
-//         if (
-//             shouldUpdateWinner &&
-//             startDeg % 360 < 360 &&
-//             startDeg % 360 > 270 &&
-//             endDeg % 360 > 0 &&
-//             endDeg % 360 < 90
-//         ) {
-//             updateWinnerDisplay(items[i]); // Update winner display with image or text
-//         }
-//     }
-// }
-
 function draw() {
     ctx.clearRect(0, 0, width, height); // Clear the canvas
 
@@ -349,7 +245,8 @@ function draw() {
             // Draw text inside the slice
             const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
             const text = items[i];
-            const fontSize = Math.min(40, radius / 10); // Dynamically calculate font size
+            const sliceArc = toRad(endDeg - startDeg);
+            const fontSize = Math.min(40, radius / 10, sliceArc * radius * 0.5); // Dynamically calculate font size
             ctx.font = `bold ${fontSize}px serif`;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -387,7 +284,6 @@ function draw() {
         }
     }
 }
-
 
 const spinSound = new Audio("public/mp3/wheel-spin.mp3"); // Load the spin sound
 spinSound.loop = true; // Make the sound loop while the wheel is spinning
