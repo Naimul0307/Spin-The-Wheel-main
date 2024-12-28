@@ -13,7 +13,7 @@ document.getElementById("showInputButton").addEventListener("click", () => {
     }
 });
 
-
+//this use for chare bakcground color
 let userBackgroundImage = null; // Store the selected background image
 const fixedColors = ["#FF5733", "#33FF57", "#3357FF", "#FFD700", "#FF69B4"]; // Default colors
 
@@ -83,9 +83,8 @@ document.getElementById("triangle-color").addEventListener("input", (event) => {
     }
 
     function easeOutSine(x) {
-        return Math.sin((x * Math.PI) / 2);
+        return Math.sin((x * Math.PI) / 2) * 2;
     }
-
     function getPercent(input, min, max) {
         return (((input - min) * 100) / (max - min)) / 100;
     }
@@ -290,8 +289,8 @@ spinSound.loop = true; // Make the sound loop while the wheel is spinning
 
 // Spin Wheel
 let isSpinning = false; 
-let speed = 0;
-let maxRotation = randomRange(360 * 3, 360 * 6);
+let speed = randomRange(200, 300); 
+let maxRotation = randomRange(360 * 12, 360 * 15); 
 let pause = true;
 let winner = null;;
 
@@ -321,8 +320,8 @@ function spin() {
     // Reset states for a new spin
     isSpinning = true;
     currentDeg = 0; // Reset the current rotation to start fresh
-    speed = randomRange(50, 100);  // Start with a random initial speed
-    maxRotation = randomRange(360 * 3, 360 * 6); // Set a random maximum rotation
+    speed = randomRange(100, 200);  // Increased speed range (from 50-100 to 100-200)
+    maxRotation = randomRange(360 * 8, 360 * 12); // Increased duration (from 360*3-360*6 to 360*5-360*8)
     pause = false;
 
     spinSound.play(); // Play the spinning sound
@@ -342,7 +341,7 @@ function animate() {
 
     // Calculate the speed based on easing
     const percentComplete = getPercent(currentDeg, maxRotation, 0);
-    speed = easeOutSine(percentComplete) * 30;
+    speed = easeOutSine(percentComplete) * 50; // Increased easing factor to make it faster
 
     if (speed < 0.01) {
         speed = 0; // Stop the wheel when speed is negligible
