@@ -10,87 +10,78 @@
 <body>
     <div>
         <button id="showInputButton">Show Input Area</button>
-        <div class="inputArea">
+        <div class="inputArea" style="display: none;"> <!-- Initially hidden -->
             <div>
-            <!-- Input for text items -->
-            <textarea id="itemTextarea"></textarea>
-            <!-- Input for uploading background image -->
-            <label for="bg-image">Upload Wheel Slice Image:</label>
-            <input type="file" id="imageUpload" multiple accept="image/*" onchange="handleImageUpload()">
+                <textarea id="itemTextarea" placeholder="Enter wheel items, one per line"></textarea>
+                <label for="imageUpload">Upload Wheel Slice Images:</label>
+                <input type="file" id="imageUpload" multiple accept="image/*">
             </div>
-    
             <div>
-            <!-- Input for selecting background color -->
-            <label for="bg-color">Choose Wheel Background Color:</label>
-            <input type="color" id="bg-color" name="bg-color" value="#f0caca">   
-            <!-- Input for uploading background image -->
-            <label for="bg-image">Upload Wheel Background Image:</label>
-            <input type="file" id="bg-image" name="bg-image" accept="image/*">
+                <label for="bg-color">Choose Wheel Background Color:</label>
+                <input type="color" id="bg-color" name="bg-color" value="#f0caca">   
+                <br>
+                <label for="bg-image">Upload Wheel Background Image:</label>
+                <input type="file" id="bg-image" name="bg-image" accept="image/*">
             </div>
-    
-            <!-- Input for changing center circle color -->
-            <label for="center-circle-color">Choose Wheel Center Circle Color:</label>
-            <input type="color" id="center-circle-color" value="#FFFFFF">
-    
-            <!-- Input for changing center circle background -->
-            <label for="center-circle-image">Upload Wheel Center Circle Image:</label>
-            <input type="file" id="center-circle-image" accept="image/*">
-    
-    
-            <!-- Input for changing triangle color -->
-            <label for="triangle-color">Choose Triangle Color:</label>
-            <input type="color" id="triangle-color" value="#D89898">
-    
             <div>
-                <div>
-                    <label for="border-color">Choose Wheel Border Color:</label>
-                    <input type="color" id="border-color" value="#000000">
-                </div>
-                <div>
-                    <label> Choose Wheel Slice Color</label>
-                    <div>
-                        <label for="color1">Color 1:</label>
-                        <input type="color" id="color1" value="#FF5733">
-                
-                        <label for="color2">Color 2:</label>
-                        <input type="color" id="color2" value="#33FF57">
-                
-                        <label for="color3">Color 3:</label>
-                        <input type="color" id="color3" value="#3357FF">
-                
-                        <label for="color4">Color 4:</label>
-                        <input type="color" id="color4" value="#FFD700">
-                
-                        <label for="color5">Color 5:</label>
-                        <input type="color" id="color5" value="#FF69B4">
-                    </div>
-                </div>
+                <label for="center-circle-color">Choose Wheel Center Circle Color:</label>
+                <input type="color" id="center-circle-color" value="#FFFFFF">
+                <br>
+                <!-- Input for changing center circle background -->
+                <label for="center-circle-image">Upload Wheel Center Circle Image:</label>
+                <input type="file" id="center-circle-image" accept="image/*">
+                <br>        
+                <!-- Input for changing triangle color -->
+                <label for="triangle-color">Choose Triangle Color:</label>
+                <input type="color" id="triangle-color" value="#D89898">
+                <br>
+                <label for="border-color">Choose Wheel Border Color:</label>
+                <input type="color" id="border-color" value="#000000">
+            </div>
+            <div>
+                <label>Choose Wheel Slice Color</label>
+                <br>
+                <label for="color1">Color 1:</label>
+                <input type="color" id="color1" value="#FF5733">
+                <br>
+                <label for="color2">Color 2:</label>
+                <input type="color" id="color2" value="#33FF57">
+                <br>
+                <label for="color3">Color 3:</label>
+                <input type="color" id="color3" value="#3357FF">
+                <br>
+                <label for="color4">Color 4:</label>
+                <input type="color" id="color4" value="#FFD700">
+                <br>
+                <label for="color5">Color 5:</label>
+                <input type="color" id="color5" value="#FF69B4">
             </div>
         </div>
     </div>
-    <div>
-            <div class="wheel">
-                <canvas id="canvas" width="900" height="900"></canvas>
-                <div class="center-circle" onclick="spin()">
-                    <div id="winner-display">
-                        <p id="winner-text">NONE</p>
-                        <img id="winner-image" src="" alt="" style="display:none;">
-                    </div>
-                </div>        
-                <div class="triangle"></div>
-            </div>
-
-            <!-- Winner Popup Modal -->
-            <div id="winnerModal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <div id="winner-popup-content">
-                        <span class="close-btn" onclick="closeWinnerModal()">&times;</span>
-                        <p id="winner-popup-text" style="display: none;"></p>
-                        <img id="winner-popup-image" style="display: none;" alt="Winner">
-                    </div>
+    <div>            
+        <div class="wheel">
+            <canvas id="canvas" width="900" height="900"></canvas>
+            <div class="center-circle" onclick="spin()" style="cursor: pointer;">
+                <div id="winner-display" hidden>
+                    <p id="winner-text">NONE</p>
+                    <img id="winner-image" src="" alt="" style="display:none;">
                 </div>
-            </div>            
+            </div>        
+            <div class="triangle"></div>
         </div>
+
+        <!-- Winner Popup Modal -->
+        <div id="winnerModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div id="winner-popup-content">
+                    <span class="close-btn" onclick="closeWinnerModal()">&times;</span>
+                    <p id="winner-popup-text" style="display: none;"></p>
+                    <img id="winner-popup-image" style="display: none;" alt="Winner">
+                </div>
+            </div>
+        </div>
+                
+    </div>
     <script src="public/src/scripts.js"></script>
 </body>
 </html>
