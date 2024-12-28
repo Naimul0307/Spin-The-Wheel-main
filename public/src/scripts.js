@@ -179,23 +179,22 @@ function createWheel() {
     draw();
 }
 
-// Function to draw the wheel with the dynamic background and border
+
 // function draw() {
 //     ctx.clearRect(0, 0, width, height); // Clear the canvas
 
 //     // Draw the background (image or color)
 //     if (userBackgroundImage) {
-//         ctx.save(); // Save the current context state
+//         ctx.save();
 //         ctx.beginPath();
 //         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
-//         ctx.clip(); // Clip the drawing to the circular area
+//         ctx.clip();
 //         ctx.drawImage(userBackgroundImage, centerX - radius, centerY - radius, radius * 2, radius * 2);
-//         ctx.restore(); // Restore the context to its original state
+//         ctx.restore();
 //     } else {
 //         ctx.beginPath();
 //         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
 //         ctx.fillStyle = getBackgroundColor(); // Get the background color from CSS
-//         ctx.lineTo(centerX, centerY);
 //         ctx.fill();
 //     }
 
@@ -214,72 +213,71 @@ function createWheel() {
 //     for (let i = 0; i < items.length; i++, startDeg += step) {
 //         const endDeg = startDeg + step;
 
-//         // If background image is used, set transparent color for the slices
-//         let colorStyle = "transparent";
-//         if (!userBackgroundImage) {
-//             // Assign color for the segment if no background image is set
-//             colorStyle = fixedColors[i % fixedColors.length];
+//         // Begin slice path
+//         ctx.beginPath();
+//         ctx.moveTo(centerX, centerY);
+//         ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
+//         ctx.closePath();
+
+//         // Draw slice background (image or color)
+//         if (images[items[i]]) {
+//             ctx.save();
+//             ctx.clip();
+
+//             // Rotate and position the image within the slice
+//             const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
+//             const imgWidth = radius; // Set the image width to the radius of the wheel
+//             const imgHeight = radius; // Set the image height to the radius of the wheel
+
+//             ctx.translate(centerX, centerY); // Move to the center of the wheel
+//             ctx.rotate(toRad(sliceAngle)); // Rotate to align with the slice
+//             ctx.drawImage(images[items[i]], 0, -imgHeight / 2, imgWidth, imgHeight);
+//             ctx.restore();
+//         } else {
+//             ctx.fillStyle = fixedColors[i % fixedColors.length];
+//             ctx.fill();
 //         }
 
-//         // Draw Wheel Segment
-//         ctx.beginPath();
-//         ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
-//         ctx.fillStyle = colorStyle; // Use transparent if image is set
-//         ctx.lineTo(centerX, centerY);
-//         ctx.fill();
+//         // Clip to the slice for text drawing
+//         ctx.save();
+//         ctx.clip();
 
-//         // Draw the border around each slice with the dynamic border color
+//         // Draw text inside the slice
+//         const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
+//         const text = items[i];
+//         const fontSize = Math.min(20, radius / 10); // Dynamically calculate font size
+//         ctx.font = `bold ${fontSize}px serif`;
+//         ctx.textAlign = "center";
+//         ctx.textBaseline = "middle";
+
+//         ctx.translate(centerX, centerY); // Move to the center of the wheel
+//         ctx.rotate(toRad(sliceAngle)); // Rotate to align with the slice
+//         ctx.fillStyle = "#fff";
+
+//         // Calculate position and ensure text stays within the slice
+//         const textRadius = radius * 0.7; // Adjust text position (closer to the center)
+//         ctx.fillText(text, textRadius, 0);
+
+//         ctx.restore(); // Restore to remove clipping
+
+//         // Draw the border around each slice
 //         ctx.lineWidth = 3; // Set the slice border width
 //         ctx.strokeStyle = borderColor; // Use the dynamically set border color
 //         ctx.stroke();
-
-//         if (images[items[i]]) {
-//             const img = images[items[i]];
-
-//             // Calculate the slice angle
-//             const sliceAngle = toRad(endDeg - startDeg); // Slice angle in radians
-//             const sliceRadius = radius * 0.8; // Slight padding to fit within the slice
-//             const maxSliceWidth = sliceRadius * Math.sin(sliceAngle / 2); // Max width of the slice
-//             const maxSliceHeight = sliceRadius * 0.6; // Adjusted height to avoid overlapping
-
-//             // Scale the image to fit within the slice dimensions
-//             const scale = Math.min(maxSliceWidth / img.width, maxSliceHeight / img.height);
-//             const imgWidth = img.width * scale;
-//             const imgHeight = img.height * scale;
-
-//             // Calculate the position for centering the image within the slice
-//             const angleMid = toRad((startDeg + endDeg) / 2); // Midpoint angle
-//             const imgX = centerX + Math.cos(angleMid) * (sliceRadius - imgHeight / 2) - imgWidth / 2;
-//             const imgY = centerY + Math.sin(angleMid) * (sliceRadius - imgHeight / 2) - imgHeight / 2;
-
-//             // Draw the image
-//             ctx.save();
-//             ctx.translate(imgX + imgWidth / 2, imgY + imgHeight / 2); // Move to the center of the image
-//             ctx.rotate(angleMid); // Align image with the slice angle
-//             ctx.drawImage(img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight);
-//             ctx.restore();
-//         } else {
-//             // Fallback to draw text (unchanged)
-//             const sliceAngle = endDeg - startDeg;
-//             const fontSize = Math.max(10, Math.min(30, sliceAngle * 0.5));
-
-//             ctx.save();
-//             ctx.translate(centerX, centerY);
-//             ctx.rotate(toRad((startDeg + endDeg) / 2));
-//             ctx.textAlign = "left";
-//             ctx.font = `bold ${fontSize}px serif`;
-//             ctx.fillStyle = "#fff";
-//             ctx.fillText(items[i], radius * 0.5, 5);
-//             ctx.restore();
-//         }
 
 //         itemDegs[items[i]] = {
 //             startDeg: startDeg,
 //             endDeg: endDeg,
 //         };
 
-//         // Only update the winner if the flag is set
-//         if (shouldUpdateWinner && startDeg % 360 < 360 && startDeg % 360 > 270 && endDeg % 360 > 0 && endDeg % 360 < 90) {
+//         // Update winner display if the flag is set
+//         if (
+//             shouldUpdateWinner &&
+//             startDeg % 360 < 360 &&
+//             startDeg % 360 > 270 &&
+//             endDeg % 360 > 0 &&
+//             endDeg % 360 < 90
+//         ) {
 //             updateWinnerDisplay(items[i]); // Update winner display with image or text
 //         }
 //     }
@@ -290,12 +288,12 @@ function draw() {
 
     // Draw the background (image or color)
     if (userBackgroundImage) {
-        ctx.save(); // Save the current context state
+        ctx.save();
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
-        ctx.clip(); // Clip the drawing to the circular area
+        ctx.clip();
         ctx.drawImage(userBackgroundImage, centerX - radius, centerY - radius, radius * 2, radius * 2);
-        ctx.restore(); // Restore the context to its original state
+        ctx.restore();
     } else {
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Define the wheel area
@@ -326,8 +324,8 @@ function draw() {
 
         // Draw slice background (image or color)
         if (images[items[i]]) {
-            ctx.save(); // Save the current context state
-            ctx.clip(); // Clip the drawing to the current slice
+            ctx.save();
+            ctx.clip();
 
             // Rotate and position the image within the slice
             const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
@@ -337,38 +335,47 @@ function draw() {
             ctx.translate(centerX, centerY); // Move to the center of the wheel
             ctx.rotate(toRad(sliceAngle)); // Rotate to align with the slice
             ctx.drawImage(images[items[i]], 0, -imgHeight / 2, imgWidth, imgHeight);
-            ctx.restore(); // Restore the context to remove clipping
+            ctx.restore();
         } else {
             ctx.fillStyle = fixedColors[i % fixedColors.length];
             ctx.fill();
         }
 
-        // Draw the border around each slice with the dynamic border color
+        // Clip to the slice for text drawing
+        if (!images[items[i]]) { // Only draw text if there is no image
+            ctx.save();
+            ctx.clip();
+
+            // Draw text inside the slice
+            const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
+            const text = items[i];
+            const fontSize = Math.min(40, radius / 10); // Dynamically calculate font size
+            ctx.font = `bold ${fontSize}px serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            ctx.translate(centerX, centerY); // Move to the center of the wheel
+            ctx.rotate(toRad(sliceAngle)); // Rotate to align with the slice
+            ctx.fillStyle = "#fff";
+
+            // Calculate position and ensure text stays within the slice
+            const textRadius = radius * 0.7; // Adjust text position (closer to the center)
+            ctx.fillText(text, textRadius, 0);
+
+            ctx.restore(); // Restore to remove clipping
+        }
+
+        // Draw the border around each slice
         ctx.lineWidth = 3; // Set the slice border width
         ctx.strokeStyle = borderColor; // Use the dynamically set border color
         ctx.stroke();
-
-        // Optional: Draw text or other elements on the slice
-        if (!images[items[i]]) {
-            const sliceAngle = endDeg - startDeg;
-            const fontSize = Math.max(10, Math.min(30, sliceAngle * 0.5));
-
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate(toRad((startDeg + endDeg) / 2));
-            ctx.textAlign = "left";
-            ctx.font = `bold ${fontSize}px serif`;
-            ctx.fillStyle = "#fff";
-            ctx.fillText(items[i], radius * 0.5, 5);
-            ctx.restore();
-        }
 
         itemDegs[items[i]] = {
             startDeg: startDeg,
             endDeg: endDeg,
         };
 
-        // Only update the winner if the flag is set
+        // Update winner display if the flag is set
         if (
             shouldUpdateWinner &&
             startDeg % 360 < 360 &&
