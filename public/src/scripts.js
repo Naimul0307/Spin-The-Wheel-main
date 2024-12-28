@@ -246,7 +246,7 @@ function draw() {
             const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
             const text = items[i];
             const sliceArc = toRad(endDeg - startDeg);
-            const fontSize = Math.min(40, radius / 10, sliceArc * radius * 0.5); // Dynamically calculate font size
+            const fontSize = Math.min(30, radius / 10, sliceArc * radius * 0.5); // Dynamically calculate font size
             ctx.font = `bold ${fontSize}px serif`;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -321,7 +321,7 @@ function spin() {
     // Reset states for a new spin
     isSpinning = true;
     currentDeg = 0; // Reset the current rotation to start fresh
-    speed = randomRange(20, 50); // Start with a random initial speed
+    speed = randomRange(50, 100);  // Start with a random initial speed
     maxRotation = randomRange(360 * 3, 360 * 6); // Set a random maximum rotation
     pause = false;
 
@@ -342,7 +342,7 @@ function animate() {
 
     // Calculate the speed based on easing
     const percentComplete = getPercent(currentDeg, maxRotation, 0);
-    speed = easeOutSine(percentComplete) * 20;
+    speed = easeOutSine(percentComplete) * 30;
 
     if (speed < 0.01) {
         speed = 0; // Stop the wheel when speed is negligible
@@ -366,18 +366,23 @@ function openWinnerModal(winner) {
     const winnerText = document.getElementById("winner-popup-text");
     const winnerImage = document.getElementById("winner-popup-image");
 
+    // Hide both text and image initially
+    winnerText.style.display = "none";
+    winnerImage.style.display = "none";
+
+    // If there is an image for the winner, show the image
     if (images[winner]) {
-        winnerText.style.display = "none";
-        winnerImage.style.display = "block";
-        winnerImage.src = images[winner].src;
+        winnerImage.src = images[winner].src; // Set image source
+        winnerImage.style.display = "block"; // Show image
     } else {
-        winnerText.style.display = "block";
-        winnerImage.style.display = "none";
-        winnerText.textContent = `Winner: ${winner}`;
+        // If no image, show the winner's name without "Winner:" text
+        winnerText.textContent = winner; // Just set the winner's name
+        winnerText.style.display = "block"; // Show text
     }
 
     modal.style.display = "block"; // Show the modal
 }
+
 
 function closeWinnerModal() {
     const modal = document.getElementById("winnerModal");
