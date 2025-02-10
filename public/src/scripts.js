@@ -296,11 +296,10 @@ let winner = null;;
 
 // Listen for keyboard key press to start spinning
 document.addEventListener("keydown", function(event) {
-    if (event.keyCode === 32 || event.keyCode === 13) { // Spacebar or Enter key
+    if (event.key === 'Enter' || event.key === 'Space') { // Spacebar or Enter key
         spin();
     }
 });
-
 
 //Update the winner text/image display
 function updateWinnerDisplay(winner) {
@@ -328,8 +327,10 @@ function spin() {
     // Reset states for a new spin
     isSpinning = true;
     currentDeg = 0; // Reset the current rotation to start fresh
-    speed = randomRange(100, 200);  // Increased speed range (from 50-100 to 100-200)
-    maxRotation = randomRange(360 * 8, 360 * 12); // Increased duration (from 360*3-360*6 to 360*5-360*8)
+    // speed = randomRange(100, 200); 
+    speed = randomRange(50, 100); // Increased speed range (from 50-100 to 100-200)
+    maxRotation = randomRange(360 * 15, 360 * 20);
+    // maxRotation = randomRange(360 * 8, 360 * 12); // Increased duration (from 360*3-360*6 to 360*5-360*8)
     pause = false;
 
     spinSound.play(); // Play the spinning sound
