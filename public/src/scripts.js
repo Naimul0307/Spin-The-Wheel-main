@@ -294,6 +294,14 @@ let maxRotation = randomRange(360 * 12, 360 * 15);
 let pause = true;
 let winner = null;;
 
+// Listen for keyboard key press to start spinning
+document.addEventListener("keydown", function(event) {
+    if (event.keyCode === 32 || event.keyCode === 13) { // Spacebar or Enter key
+        spin();
+    }
+});
+
+
 //Update the winner text/image display
 function updateWinnerDisplay(winner) {
     const winnerText = document.getElementById("winner-text");
