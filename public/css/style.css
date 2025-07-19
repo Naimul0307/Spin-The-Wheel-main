@@ -169,7 +169,6 @@ textarea {
     max-height: 300px;
     object-fit: contain;
     margin-bottom: 20px;
-    margin-left: -100px;
     transform-origin: center;
 }
 

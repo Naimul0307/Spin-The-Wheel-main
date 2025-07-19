@@ -407,10 +407,15 @@ let winner = null;;
 
 // Listen for keyboard key press to start spinning
 document.addEventListener("keydown", function(event) {
-    if (event.key === 'Enter' || event.key === 'Space') { // Spacebar or Enter key
-        spin();
+    const modalVisible = document.getElementById("winnerModal").style.display === "block";
+    
+    if ((event.key === 'Enter' || event.key === ' ') && !modalVisible) {
+        spin(); // Only spin if modal is NOT visible
+    } else if ((event.key === 'Enter' || event.key === ' ') && modalVisible) {
+        closeWinnerModal(); // Close the modal if it's visible
     }
 });
+
 
 //Update the winner text/image display
 function updateWinnerDisplay(winner) {
@@ -431,22 +436,21 @@ function updateWinnerDisplay(winner) {
 }
 
 function spin() {
-    if (isSpinning) {
-        return; // Prevent starting a new spin if one is already in progress
+    if (isSpinning || document.getElementById("winnerModal").style.display === "block") {
+        return; // Don't spin if already spinning or if modal is visible
     }
 
-    // Reset states for a new spin
+    // Proceed to spin...
     isSpinning = true;
-    currentDeg = 0; // Reset the current rotation to start fresh
-    // speed = randomRange(100, 200); 
-    speed = randomRange(50, 100); // Increased speed range (from 50-100 to 100-200)
+    currentDeg = 0;
+    speed = randomRange(50, 100);
     maxRotation = randomRange(360 * 15, 360 * 20);
-    // maxRotation = randomRange(360 * 8, 360 * 12); // Increased duration (from 360*3-360*6 to 360*5-360*8)
     pause = false;
 
-    spinSound.play(); // Play the spinning sound
-    window.requestAnimationFrame(animate); // Start the animation loop
+    spinSound.play();
+    window.requestAnimationFrame(animate);
 }
+
 
 function animate() {
     if (pause) {
