@@ -220,45 +220,57 @@ function draw() {
         // Draw slice background (image or color)
         if (images[items[i]]) {
             ctx.save();
-            ctx.clip();
 
-            // Rotate and position the image within the slice
-            const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
-            const imgWidth = radius; // Set the image width to the radius of the wheel
-            const imgHeight = radius; // Set the image height to the radius of the wheel
+            // Create slice path
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
+            ctx.closePath();
+            ctx.clip(); // Clip to the slice
 
-            ctx.translate(centerX, centerY); // Move to the center of the wheel
-            ctx.rotate(toRad(sliceAngle)); // Rotate to align with the slice
-            ctx.drawImage(images[items[i]], 0, -imgHeight / 2, imgWidth, imgHeight);
+            // Move origin to center
+            ctx.translate(centerX, centerY);
+
+            // Rotate to align image to slice angle
+            const midAngle = (startDeg + endDeg) / 2;
+            ctx.rotate(toRad(midAngle));
+
+            // Draw the image to cover the full slice (adjust size to fill)
+            const img = images[items[i]];
+            const imgWidth = radius;
+            const imgHeight = radius;
+
+            ctx.drawImage(img, 0, -imgHeight / 2, imgWidth, imgHeight);
+
             ctx.restore();
-        } else {
+        }else {
             ctx.fillStyle = fixedColors[i % fixedColors.length];
             ctx.fill();
         }
 
         // Clip to the slice for text drawing
-        if (!images[items[i]]) { // Only draw text if there is no image
+        if (!images[items[i]]) {
             ctx.save();
             ctx.clip();
 
             // Draw text inside the slice
-            const sliceAngle = (startDeg + endDeg) / 2; // Midpoint angle of the slice
+            const sliceAngle = (startDeg + endDeg) / 2; 
             const text = items[i];
             const sliceArc = toRad(endDeg - startDeg);
-            const fontSize = Math.min(30, radius / 10, sliceArc * radius * 0.5); // Dynamically calculate font size
+            const fontSize = Math.min(30, radius / 10, sliceArc * radius * 0.5)
             ctx.font = `bold ${fontSize}px serif`;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
 
-            ctx.translate(centerX, centerY); // Move to the center of the wheel
-            ctx.rotate(toRad(sliceAngle)); // Rotate to align with the slice
+            ctx.translate(centerX, centerY);
+            ctx.rotate(toRad(sliceAngle));
             ctx.fillStyle = "#fff";
 
             // Calculate position and ensure text stays within the slice
-            const textRadius = radius * 0.7; // Adjust text position (closer to the center)
+            const textRadius = radius * 0.7;
             ctx.fillText(text, textRadius, 0);
 
-            ctx.restore(); // Restore to remove clipping
+            ctx.restore();
         }
 
         // Draw the border around each slice
@@ -283,6 +295,105 @@ function draw() {
         }
     }
 }
+
+// function draw() {
+//     ctx.clearRect(0, 0, width, height);
+
+//     // Draw the wheel background (global)
+//     if (userBackgroundImage) {
+//         ctx.save();
+//         ctx.beginPath();
+//         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+//         ctx.clip();
+//         ctx.drawImage(userBackgroundImage, centerX - radius, centerY - radius, radius * 2, radius * 2);
+//         ctx.restore();
+//     } else {
+//         ctx.beginPath();
+//         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+//         ctx.fillStyle = getBackgroundColor();
+//         ctx.fill();
+//     }
+
+//     // Wheel border
+//     ctx.beginPath();
+//     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+//     ctx.lineWidth = 5;
+//     ctx.strokeStyle = borderColor;
+//     ctx.stroke();
+
+//     if (items.length === 0 || items[0].trim() === "") return;
+
+//     let startDeg = currentDeg;
+
+//     for (let i = 0; i < items.length; i++, startDeg += step) {
+//         const endDeg = startDeg + step;
+//         const midDeg = (startDeg + endDeg) / 2;
+//         const sliceAngleRad = toRad(endDeg - startDeg);
+//         const item = items[i];
+//         const img = images[item];
+
+//         // === Slice Background Color ===
+//         ctx.beginPath();
+//         ctx.moveTo(centerX, centerY);
+//         ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
+//         ctx.closePath();
+
+//         ctx.fillStyle = fixedColors[i % fixedColors.length]; // Always draw background color
+//         ctx.fill();
+
+//         // === Slice Image (smaller, centered in wedge) ===
+//         if (img) {
+//             ctx.save();
+//             ctx.clip();
+//             ctx.translate(centerX, centerY);
+//             ctx.rotate(toRad(midDeg));
+
+//             // Smaller image dimensions
+//             const imgWidth = radius * 0.6;
+//             const imgHeight = radius * 0.25;
+
+//             ctx.drawImage(img, radius * 0.2, -imgHeight / 2, imgWidth, imgHeight);
+
+//             ctx.restore();
+//         } else {
+//             // === Text Only if No Image ===
+//             ctx.save();
+//             ctx.clip();
+//             ctx.translate(centerX, centerY);
+//             ctx.rotate(toRad(midDeg));
+
+//             const fontSize = Math.min(30, radius / 10, sliceAngleRad * radius * 0.5);
+//             ctx.font = `bold ${fontSize}px serif`;
+//             ctx.textAlign = "center";
+//             ctx.textBaseline = "middle";
+//             ctx.fillStyle = "#fff";
+
+//             ctx.fillText(item, radius * 0.7, 0);
+//             ctx.restore();
+//         }
+
+//         // === Slice Border ===
+//         ctx.beginPath();
+//         ctx.moveTo(centerX, centerY);
+//         ctx.arc(centerX, centerY, radius - 2, toRad(startDeg), toRad(endDeg));
+//         ctx.closePath();
+//         ctx.lineWidth = 3;
+//         ctx.strokeStyle = borderColor;
+//         ctx.stroke();
+
+//         itemDegs[item] = { startDeg, endDeg };
+
+//         if (
+//             shouldUpdateWinner &&
+//             startDeg % 360 < 360 &&
+//             startDeg % 360 > 270 &&
+//             endDeg % 360 > 0 &&
+//             endDeg % 360 < 90
+//         ) {
+//             updateWinnerDisplay(item);
+//         }
+//     }
+// }
 
 const spinSound = new Audio("public/mp3/wheel-spin.mp3"); // Load the spin sound
 spinSound.loop = true; // Make the sound loop while the wheel is spinning

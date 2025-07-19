@@ -4,7 +4,7 @@
   "main": "main.js",
   "scripts": {
     "start": "npx electron .",
-    "package-win": "electron-packager . electron-app --platform=win32 --arch=x64 --out=dist --electron-version=16.0.5 --icon=favicon.ico --overwrite"
+    "package-win": "electron-packager . --platform=win32 --arch=x64 --out=dist --electron-version=16.0.5 --icon=favicon.ico --overwrite"
   },
   "devDependencies": {
     "electron": "^31.6.0",

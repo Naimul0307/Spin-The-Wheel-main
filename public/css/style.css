@@ -168,8 +168,11 @@ textarea {
     max-width: 80%;
     max-height: 300px;
     object-fit: contain;
-    margin-bottom: 20px; /* Space between image and button */
+    margin-bottom: 20px;
+    margin-left: -100px;
+    transform-origin: center;
 }
+
 
 .close-btn {
     background-color: #D89898;
